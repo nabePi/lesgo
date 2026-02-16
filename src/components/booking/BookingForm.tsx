@@ -5,34 +5,25 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/lib/supabase';
 
-interface BookingFormProps {
-  tutorId: string;
-  hourlyRate: number;
-}
-
-export function BookingForm({ tutorId, hourlyRate }: BookingFormProps) {
+export function BookingForm({ tutorId, hourlyRate }: { tutorId: string; hourlyRate: number }) {
   const [subject, setSubject] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [duration, setDuration] = useState(1);
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
-
   const totalAmount = hourlyRate * duration;
   const commission = Math.round(totalAmount * 0.15);
-  const tutorEarnings = totalAmount - commission;
 
   const handleSubmit = async () => {
     setLoading(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { alert('Silakan login'); setLoading(false); return; }
-
     const { data, error } = await supabase.from('bookings').insert({
       parent_id: user.id, tutor_id: tutorId, subject, session_date: date,
       session_time: time, duration_hours: duration, address, hourly_rate: hourlyRate,
-      total_amount: totalAmount, commission_amount: commission, tutor_earnings: tutorEarnings,
+      total_amount: totalAmount, commission_amount: commission, tutor_earnings: totalAmount - commission,
     }).select().single();
-
     if (error) alert(error.message);
     else window.location.href = `/parent/payment/${data.id}`;
     setLoading(false);
