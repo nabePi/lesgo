@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LesGo - Platform Les Private Indonesia
 
-## Getting Started
+Platform marketplace untuk menghubungkan orang tua/siswa dengan guru les private terdekat berdasarkan lokasi dan mata pelajaran.
 
-First, run the development server:
+## 🎯 Fitur
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Pencarian Guru**: Cari guru les berdasarkan mata pelajaran dan lokasi terdekat
+- **Geospatial Search**: Temukan guru dalam radius tertentu dari lokasi Anda
+- **Booking System**: Pesan jadwal les dengan mudah
+- **Payment Integration**: Pembayaran aman via Midtrans
+- **Dashboard Guru**: Kelola jadwal dan penghasilan
+- **PWA Ready**: Install sebagai aplikasi mobile
+
+## 🚀 Tech Stack
+
+- **Frontend**: Next.js 16, Tailwind CSS, shadcn/ui
+- **Backend**: Next.js API Routes, Server Actions
+- **Database**: PostgreSQL + PostGIS (Supabase)
+- **Auth**: Supabase Auth (OTP via WhatsApp)
+- **Payment**: Midtrans (Snap)
+- **Maps**: Google Maps API
+
+## 📁 Dokumentasi
+
+- [Design Document](./docs/2026-02-16-lesgo-design.md) - Spesifikasi fitur dan arsitektur
+- [Implementation Plan](./docs/2026-02-16-lesgo-implementation.md) - Detail implementasi dan tasks
+
+## 🛠️ Setup
+
+### Prerequisites
+- Node.js 18+
+- Supabase account
+- Midtrans account (sandbox untuk development)
+- Google Maps API key
+
+### Environment Variables
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+MIDTRANS_SERVER_KEY=your-midtrans-server-key
+MIDTRANS_CLIENT_KEY=your-midtrans-client-key
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your-google-maps-key
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
+```bash
+npm install
+npm run dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📱 Routes
 
-## Learn More
+| Route | Description |
+|-------|-------------|
+| `/` | Landing page |
+| `/register` | Register (Parent/Tutor) |
+| `/login` | Login with OTP |
+| `/parent/search` | Search for tutors |
+| `/parent/tutor/[id]` | Tutor profile & booking |
+| `/tutor/dashboard` | Tutor dashboard |
 
-To learn more about Next.js, take a look at the following resources:
+## 🗄️ Database Schema
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Lihat [migrations](./supabase/migrations/) untuk detail schema:
+- `profiles` - User profiles (parent/tutor)
+- `tutor_profiles` - Tutor-specific data
+- `bookings` - Booking sessions
+- `payments` - Payment records
+- `reviews` - Tutor reviews
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📝 License
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
