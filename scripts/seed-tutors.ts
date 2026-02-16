@@ -21,7 +21,8 @@ if (!supabaseUrl || !supabaseServiceKey) {
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-// Sample tutor data around Jakarta area
+// Sample tutor data around Jakarta area with wilayah codes
+// Province: DKI Jakarta (31)
 const sampleTutors = [
   {
     email: 'budi.santoso@example.com',
@@ -36,6 +37,11 @@ const sampleTutors = [
     rating: 4.9,
     total_reviews: 28,
     is_verified: true,
+    // Jakarta Pusat - Gambir - Gambir
+    province_id: '31',
+    city_id: '31.71',
+    district_id: '31.71.01',
+    village_id: '31.71.01.1001',
   },
   {
     email: 'siti.aminah@example.com',
@@ -50,6 +56,11 @@ const sampleTutors = [
     rating: 4.8,
     total_reviews: 42,
     is_verified: true,
+    // Jakarta Pusat - Menteng - Menteng
+    province_id: '31',
+    city_id: '31.71',
+    district_id: '31.71.04',
+    village_id: '31.71.04.1001',
   },
   {
     email: 'ahmad.fauzi@example.com',
@@ -64,6 +75,11 @@ const sampleTutors = [
     rating: 4.7,
     total_reviews: 19,
     is_verified: true,
+    // Jakarta Barat - Palmerah - Palmerah
+    province_id: '31',
+    city_id: '31.73',
+    district_id: '31.73.05',
+    village_id: '31.73.05.1001',
   },
   {
     email: 'dewi.kusuma@example.com',
@@ -78,6 +94,11 @@ const sampleTutors = [
     rating: 4.9,
     total_reviews: 35,
     is_verified: true,
+    // Jakarta Barat - Palmerah - Slipi
+    province_id: '31',
+    city_id: '31.73',
+    district_id: '31.73.05',
+    village_id: '31.73.05.1003',
   },
   {
     email: 'eko.prasetyo@example.com',
@@ -92,6 +113,11 @@ const sampleTutors = [
     rating: 4.8,
     total_reviews: 23,
     is_verified: true,
+    // Jakarta Barat - Kebon Jeruk - Kebon Jeruk
+    province_id: '31',
+    city_id: '31.73',
+    district_id: '31.73.03',
+    village_id: '31.73.03.1001',
   },
   {
     email: 'rina.wulandari@example.com',
@@ -106,6 +132,11 @@ const sampleTutors = [
     rating: 4.6,
     total_reviews: 15,
     is_verified: true,
+    // Jakarta Selatan - Setiabudi - Kuningan
+    province_id: '31',
+    city_id: '31.74',
+    district_id: '31.74.02',
+    village_id: '31.74.02.1002',
   },
   {
     email: 'yusuf.maulana@example.com',
@@ -120,6 +151,11 @@ const sampleTutors = [
     rating: 5.0,
     total_reviews: 31,
     is_verified: true,
+    // Jakarta Selatan - Tebet - Tebet
+    province_id: '31',
+    city_id: '31.74',
+    district_id: '31.74.07',
+    village_id: '31.74.07.1001',
   },
   {
     email: 'maya.anggraini@example.com',
@@ -134,6 +170,11 @@ const sampleTutors = [
     rating: 4.9,
     total_reviews: 26,
     is_verified: true,
+    // Jakarta Barat - Kembangan - Kembangan
+    province_id: '31',
+    city_id: '31.73',
+    district_id: '31.73.10',
+    village_id: '31.73.10.1001',
   },
   {
     email: 'fajar.hidayat@example.com',
@@ -148,6 +189,11 @@ const sampleTutors = [
     rating: 4.7,
     total_reviews: 18,
     is_verified: true,
+    // Jakarta Selatan - Cilandak - Cilandak
+    province_id: '31',
+    city_id: '31.74',
+    district_id: '31.74.05',
+    village_id: '31.74.05.1001',
   },
   {
     email: 'lena.susanti@example.com',
@@ -162,6 +208,11 @@ const sampleTutors = [
     rating: 4.8,
     total_reviews: 22,
     is_verified: true,
+    // Jakarta Selatan - Pancoran - Pancoran
+    province_id: '31',
+    city_id: '31.74',
+    district_id: '31.74.08',
+    village_id: '31.74.08.1001',
   },
   {
     email: 'adi.nugroho@example.com',
@@ -176,6 +227,11 @@ const sampleTutors = [
     rating: 4.5,
     total_reviews: 12,
     is_verified: false,
+    // Jakarta Utara - Tanjung Priok - Tanjung Priok
+    province_id: '31',
+    city_id: '31.72',
+    district_id: '31.72.05',
+    village_id: '31.72.05.1001',
   },
   {
     email: 'sari.putri@example.com',
@@ -190,6 +246,11 @@ const sampleTutors = [
     rating: 4.9,
     total_reviews: 38,
     is_verified: true,
+    // Jakarta Utara - Kelapa Gading - Kelapa Gading
+    province_id: '31',
+    city_id: '31.72',
+    district_id: '31.72.06',
+    village_id: '31.72.06.1001',
   },
 ];
 
@@ -261,6 +322,10 @@ async function seedTutors() {
           location_lat: tutor.lat,
           location_lng: tutor.lng,
           address: tutor.address,
+          province_id: tutor.province_id,
+          city_id: tutor.city_id,
+          district_id: tutor.district_id,
+          village_id: tutor.village_id,
           is_active: true,
         }, { onConflict: 'user_id' });
 

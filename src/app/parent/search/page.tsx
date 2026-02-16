@@ -2,41 +2,40 @@
 
 import { useState } from 'react';
 import { SubjectSelector } from '@/components/search/SubjectSelector';
-import { LocationPicker } from '@/components/search/LocationPicker';
+import { WilayahLocationPicker } from '@/components/search/WilayahLocationPicker';
 import { TutorCard } from '@/components/search/TutorCard';
 import { TutorProfile } from '@/types';
+import type { SelectedLocation } from '@/types/wilayah';
 import { Button } from '@/components/ui/button';
-import { Search, Loader2, GraduationCap, Users, Inbox, ArrowLeft } from 'lucide-react';
+import { Search, Loader2, GraduationCap, Users, Inbox } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
 export default function SearchPage() {
   const [subject, setSubject] = useState('');
-  const [location, setLocation] = useState<{ lat: number; lng: number; address: string } | null>(null);
+  const [location, setLocation] = useState<SelectedLocation | null>(null);
   const [tutors, setTutors] = useState<TutorProfile[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const searchTutors = async () => {
-    if (!subject || !location) return;
+    if (!subject || !location?.village) return;
 
     setLoading(true);
     setSearched(true);
     try {
       const response = await fetch(
-        `/api/tutors/search?subject=${encodeURIComponent(subject)}&lat=${location.lat}&lng=${location.lng}&radius=10`
+        `/api/tutors/search?subject=${encodeURIComponent(subject)}&villageId=${location.village.id}&districtId=${location.district?.id}`
       );
       const data = await response.json();
       setTutors(data.tutors || []);
+      setExpanded(data.expanded || false);
     } catch (error) {
       console.error('Search error:', error);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleLocationSelect = (lat: number, lng: number, address: string) => {
-    setLocation({ lat, lng, address });
   };
 
   return (
@@ -74,17 +73,17 @@ export default function SearchPage() {
 
           <div className="space-y-5">
             <SubjectSelector value={subject} onChange={setSubject} />
-            <LocationPicker
-              onLocationSelect={handleLocationSelect}
-              selectedLocation={location}
+            <WilayahLocationPicker
+              onChange={setLocation}
+              value={location || undefined}
             />
 
             <Button
               onClick={searchTutors}
-              disabled={loading || !subject || !location}
+              disabled={loading || !subject || !location?.village}
               className={cn(
                 "w-full h-14 text-base font-semibold transition-all duration-200",
-                !subject || !location
+                !subject || !location?.village
                   ? "bg-slate-200 text-slate-400 cursor-not-allowed"
                   : "bg-emerald-500 hover:bg-emerald-600 hover:-translate-y-0.5 hover:shadow-lg"
               )}
@@ -114,10 +113,19 @@ export default function SearchPage() {
               </h2>
               {tutors.length > 0 && (
                 <span className="text-sm text-slate-500">
-                  dalam radius 10 km
+                  {expanded ? 'Dalam kecamatan yang sama' : 'Dalam kelurahan/desa yang sama'}
                 </span>
               )}
             </div>
+
+            {/* Expanded search indicator */}
+            {expanded && (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <p className="text-sm text-amber-800">
+                  Tidak ada guru di kelurahan/desa Anda. Menampilkan guru di kecamatan terdekat.
+                </p>
+              </div>
+            )}
 
             {tutors.length > 0 ? (
               <div className="space-y-4">
@@ -125,7 +133,6 @@ export default function SearchPage() {
                   <TutorCard
                     key={tutor.id}
                     tutor={tutor}
-                    distance={tutor.distance}
                   />
                 ))}
               </div>
@@ -138,7 +145,7 @@ export default function SearchPage() {
                   Tidak ada guru ditemukan
                 </h3>
                 <p className="text-sm text-slate-500 max-w-sm mx-auto">
-                  Coba ubah lokasi atau pilih mata pelajaran lain. Anda juga bisa memperluas radius pencarian.
+                  Coba ubah lokasi atau pilih mata pelajaran lain.
                 </p>
               </div>
             )}
