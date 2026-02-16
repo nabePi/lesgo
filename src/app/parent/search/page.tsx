@@ -6,6 +6,11 @@ import { WilayahLocationPicker } from '@/components/search/WilayahLocationPicker
 import { TutorCard } from '@/components/search/TutorCard';
 import { TutorProfile } from '@/types';
 import type { SelectedLocation } from '@/types/wilayah';
+
+interface LocationWithGps extends SelectedLocation {
+  coords?: { lat: number; lng: number };
+  address?: string;
+}
 import { Button } from '@/components/ui/button';
 import { Search, Loader2, GraduationCap, Users, Inbox } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -13,21 +18,30 @@ import Link from 'next/link';
 
 export default function SearchPage() {
   const [subject, setSubject] = useState('');
-  const [location, setLocation] = useState<SelectedLocation | null>(null);
+  const [location, setLocation] = useState<LocationWithGps | null>(null);
   const [tutors, setTutors] = useState<TutorProfile[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
   const searchTutors = async () => {
-    if (!subject || !location?.village) return;
+    // Allow search if subject AND (village OR coords) are available
+    if (!subject || (!location?.village && !location?.coords)) return;
 
     setLoading(true);
     setSearched(true);
     try {
-      const response = await fetch(
-        `/api/tutors/search?subject=${encodeURIComponent(subject)}&villageId=${location.village.id}&districtId=${location.district?.id}`
-      );
+      let url = `/api/tutors/search?subject=${encodeURIComponent(subject)}`;
+
+      if (location?.village) {
+        // Manual location search
+        url += `&villageId=${location.village.id}&districtId=${location.district?.id}`;
+      } else if (location?.coords) {
+        // GPS location search
+        url += `&lat=${location.coords.lat}&lng=${location.coords.lng}`;
+      }
+
+      const response = await fetch(url);
       const data = await response.json();
       setTutors(data.tutors || []);
       setExpanded(data.expanded || false);
@@ -80,10 +94,10 @@ export default function SearchPage() {
 
             <Button
               onClick={searchTutors}
-              disabled={loading || !subject || !location?.village}
+              disabled={loading || !subject || (!location?.village && !location?.coords)}
               className={cn(
                 "w-full h-14 text-base font-semibold transition-all duration-200",
-                !subject || !location?.village
+                !subject || (!location?.village && !location?.coords)
                   ? "bg-slate-200 text-slate-400 cursor-not-allowed"
                   : "bg-emerald-500 hover:bg-emerald-600 hover:-translate-y-0.5 hover:shadow-lg"
               )}
@@ -92,6 +106,16 @@ export default function SearchPage() {
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Mencari guru...
+                </>
+              ) : !subject ? (
+                <>
+                  <Search className="mr-2 h-5 w-5" />
+                  Pilih mata pelajaran dulu
+                </>
+              ) : (!location?.village && !location?.coords) ? (
+                <>
+                  <Search className="mr-2 h-5 w-5" />
+                  Pilih lokasi dulu
                 </>
               ) : (
                 <>
