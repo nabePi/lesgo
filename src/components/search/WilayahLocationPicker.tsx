@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Loader2, Check, Navigation, AlertCircle, MapPin, Crosshair } from 'lucide-react';
+import { Loader2, Check, Navigation, AlertCircle, MapPin, Crosshair, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
@@ -285,15 +285,21 @@ export function WilayahLocationPicker({ onChange, value }: WilayahLocationPicker
   const isComplete = selectedProvince && selectedCity && selectedDistrict && selectedVillage;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+      {/* Label */}
       <div className="flex items-center gap-2">
-        <Navigation className="w-5 h-5 text-indigo-600" />
-        <label className="font-semibold text-slate-900">Lokasi</label>
+        <div className="w-10 h-10 bg-gradient-to-br from-indigo-100 to-violet-100 rounded-xl flex items-center justify-center">
+          <Navigation className="w-5 h-5 text-indigo-600" />
+        </div>
+        <div>
+          <label className="font-bold text-slate-900 text-lg">Lokasi</label>
+          <p className="text-sm text-slate-500">Tentukan lokasi untuk mencari tutor terdekat</p>
+        </div>
       </div>
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-sm font-medium text-red-900">Gagal memuat data lokasi</p>
@@ -311,37 +317,40 @@ export function WilayahLocationPicker({ onChange, value }: WilayahLocationPicker
         disabled={gpsLoading}
         variant="outline"
         className={cn(
-          "w-full h-14 justify-start gap-3 text-left border-2 border-slate-200 hover:border-indigo-400",
-          "rounded-xl transition-all duration-200"
+          "w-full h-auto py-4 justify-start gap-4 text-left border-2 border-slate-200 hover:border-indigo-400",
+          "rounded-2xl transition-all duration-200 group"
         )}
       >
-        <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+        <div className="w-12 h-12 bg-gradient-to-br from-indigo-100 to-violet-100 rounded-xl flex items-center justify-center group-hover:from-indigo-200 group-hover:to-violet-200 transition-colors">
           {gpsLoading ? (
-            <Loader2 className="w-5 h-5 text-indigo-600 animate-spin" />
+            <Loader2 className="w-6 h-6 text-indigo-600 animate-spin" />
           ) : (
-            <Crosshair className="w-5 h-5 text-indigo-600" />
+            <Crosshair className="w-6 h-6 text-indigo-600" />
           )}
         </div>
         <div className="flex-1">
-          <p className="font-medium text-slate-900">Gunakan Lokasi Saat Ini</p>
-          <p className="text-xs text-slate-500">Deteksi otomatis GPS</p>
+          <p className="font-bold text-slate-900 text-base">Gunakan Lokasi Saat Ini</p>
+          <p className="text-sm text-slate-500">Deteksi otomatis GPS - Paling akurat</p>
         </div>
+        <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors" />
       </Button>
 
       {/* GPS Detected Location Banner */}
       {showGpsBanner && detectedAddress && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
-          <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-4 sm:p-5 flex items-start gap-3">
+          <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <MapPin className="w-5 h-5 text-blue-600" />
+          </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-blue-900">Lokasi terdeteksi</p>
-            <p className="text-sm text-blue-700 truncate">{detectedAddress}</p>
+            <p className="font-semibold text-slate-900">Lokasi terdeteksi</p>
+            <p className="text-sm text-slate-600 truncate">{detectedAddress}</p>
             <p className="text-xs text-blue-600 mt-1">
               Anda bisa langsung mencari guru terdekat
             </p>
           </div>
           <button
             onClick={clearGpsLocation}
-            className="text-sm text-blue-700 hover:text-blue-800 font-medium"
+            className="text-sm text-slate-500 hover:text-red-600 font-medium px-3 py-1 rounded-full hover:bg-red-50 transition-colors"
           >
             Hapus
           </button>
@@ -350,191 +359,206 @@ export function WilayahLocationPicker({ onChange, value }: WilayahLocationPicker
 
       {/* Divider - Hidden when GPS is active */}
       {!coords && (
-        <div className="relative">
+        <div className="relative py-2">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-slate-200" />
           </div>
-          <div className="relative flex justify-center text-xs">
-            <span className="px-2 bg-white text-slate-500">atau pilih manual</span>
+          <div className="relative flex justify-center">
+            <span className="px-4 bg-white text-slate-400 text-sm font-medium">atau pilih manual</span>
           </div>
         </div>
       )}
 
       {/* GPS Active Indicator */}
       {coords && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 flex items-center gap-3">
-          <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-            <Check className="w-5 h-5 text-emerald-600" />
+        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-4 sm:p-5 flex items-center gap-4">
+          <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Check className="w-6 h-6 text-emerald-600" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-emerald-900">Menggunakan lokasi GPS</p>
-            <p className="text-sm text-emerald-700">Anda bisa langsung mencari guru</p>
+            <p className="font-bold text-slate-900">Menggunakan lokasi GPS</p>
+            <p className="text-sm text-slate-600">Anda bisa langsung mencari guru terdekat</p>
           </div>
         </div>
       )}
 
       {/* Manual Selection - Hidden when GPS is active */}
       {!coords && (
-        <>
+        <div className="space-y-4">
           {/* Province */}
-      <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1.5">
-          Provinsi
-        </label>
-        <Select
-          value={selectedProvince?.id}
-          onValueChange={handleProvinceChange}
-          disabled={loading.provinces}
-        >
-          <SelectTrigger className="h-12">
-            <SelectValue placeholder={loading.provinces ? 'Memuat...' : 'Pilih Provinsi'} />
-          </SelectTrigger>
-          <SelectContent>
-            {provinces.map(province => (
-              <SelectItem key={province.id} value={province.id}>
-                {province.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+              <span className="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+              Provinsi
+            </label>
+            <Select
+              value={selectedProvince?.id}
+              onValueChange={handleProvinceChange}
+              disabled={loading.provinces}
+            >
+              <SelectTrigger className="h-12 sm:h-14 rounded-xl border-slate-200 focus:ring-indigo-500 focus:border-indigo-500">
+                <SelectValue placeholder={loading.provinces ? 'Memuat...' : 'Pilih Provinsi'} />
+              </SelectTrigger>
+              <SelectContent className="max-h-[300px]">
+                {provinces.map(province => (
+                  <SelectItem key={province.id} value={province.id}>
+                    {province.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-      {/* City */}
-      <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1.5">
-          Kota/Kabupaten
-        </label>
-        <Select
-          value={selectedCity?.id}
-          onValueChange={handleCityChange}
-          disabled={!selectedProvince || loading.cities}
-        >
-          <SelectTrigger className="h-12">
-            <SelectValue placeholder={
-              !selectedProvince ? 'Pilih provinsi dulu' :
-              loading.cities ? 'Memuat...' :
-              'Pilih Kota/Kabupaten'
-            } />
-          </SelectTrigger>
-          <SelectContent>
-            {cities.map(city => (
-              <SelectItem key={city.id} value={city.id}>
-                {city.type === 'city' ? 'Kota ' : 'Kabupaten '}{city.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+          {/* City */}
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+              <span className="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+              Kota/Kabupaten
+            </label>
+            <Select
+              value={selectedCity?.id}
+              onValueChange={handleCityChange}
+              disabled={!selectedProvince || loading.cities}
+            >
+              <SelectTrigger className="h-12 sm:h-14 rounded-xl border-slate-200 focus:ring-indigo-500 focus:border-indigo-500">
+                <SelectValue placeholder={
+                  !selectedProvince ? 'Pilih provinsi dulu' :
+                  loading.cities ? 'Memuat...' :
+                  'Pilih Kota/Kabupaten'
+                } />
+              </SelectTrigger>
+              <SelectContent className="max-h-[300px]">
+                {cities.map(city => (
+                  <SelectItem key={city.id} value={city.id}>
+                    {city.type === 'city' ? 'Kota ' : 'Kabupaten '}{city.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-      {/* District */}
-      <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1.5">
-          Kecamatan
-        </label>
-        <Select
-          value={selectedDistrict?.id}
-          onValueChange={handleDistrictChange}
-          disabled={!selectedCity || loading.districts}
-        >
-          <SelectTrigger className="h-12">
-            <SelectValue placeholder={
-              !selectedCity ? 'Pilih kota dulu' :
-              loading.districts ? 'Memuat...' :
-              'Pilih Kecamatan'
-            } />
-          </SelectTrigger>
-          <SelectContent>
-            {districts.map(district => (
-              <SelectItem key={district.id} value={district.id}>
-                {district.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+          {/* District */}
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+              <span className="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+              Kecamatan
+            </label>
+            <Select
+              value={selectedDistrict?.id}
+              onValueChange={handleDistrictChange}
+              disabled={!selectedCity || loading.districts}
+            >
+              <SelectTrigger className="h-12 sm:h-14 rounded-xl border-slate-200 focus:ring-indigo-500 focus:border-indigo-500">
+                <SelectValue placeholder={
+                  !selectedCity ? 'Pilih kota dulu' :
+                  loading.districts ? 'Memuat...' :
+                  'Pilih Kecamatan'
+                } />
+              </SelectTrigger>
+              <SelectContent className="max-h-[300px]">
+                {districts.map(district => (
+                  <SelectItem key={district.id} value={district.id}>
+                    {district.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-      {/* Village */}
-      <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1.5">
-          Kelurahan/Desa
-        </label>
-        <Select
-          value={selectedVillage?.id}
-          onValueChange={handleVillageChange}
-          disabled={!selectedDistrict || loading.villages}
-        >
-          <SelectTrigger className="h-12">
-            <SelectValue placeholder={
-              !selectedDistrict ? 'Pilih kecamatan dulu' :
-              loading.villages ? 'Memuat...' :
-              'Pilih Kelurahan/Desa'
-            } />
-          </SelectTrigger>
-          <SelectContent className="max-h-[300px]">
-            {villages.map(village => (
-              <SelectItem key={village.id} value={village.id}>
-                {village.type === 'urban' ? 'Kel. ' : 'Desa '}{village.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+          {/* Village */}
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+              <span className="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">4</span>
+              Kelurahan/Desa
+            </label>
+            <Select
+              value={selectedVillage?.id}
+              onValueChange={handleVillageChange}
+              disabled={!selectedDistrict || loading.villages}
+            >
+              <SelectTrigger className="h-12 sm:h-14 rounded-xl border-slate-200 focus:ring-indigo-500 focus:border-indigo-500">
+                <SelectValue placeholder={
+                  !selectedDistrict ? 'Pilih kecamatan dulu' :
+                  loading.villages ? 'Memuat...' :
+                  'Pilih Kelurahan/Desa'
+                } />
+              </SelectTrigger>
+              <SelectContent className="max-h-[300px]">
+                {villages.map(village => (
+                  <SelectItem key={village.id} value={village.id}>
+                    {village.type === 'urban' ? 'Kel. ' : 'Desa '}{village.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
           {/* Selected Summary - Manual */}
           {isComplete && (
-            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-start gap-3">
-              <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <Check className="w-5 h-5 text-emerald-600" />
+            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-4 sm:p-5 flex items-start gap-4">
+              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Check className="w-6 h-6 text-emerald-600" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-emerald-900">Lokasi lengkap dipilih</p>
-                <p className="text-sm text-emerald-700">
+                <p className="font-bold text-slate-900">Lokasi lengkap dipilih</p>
+                <p className="text-sm text-slate-600">
                   {selectedVillage?.name}, {selectedDistrict?.name}
                 </p>
-                <p className="text-xs text-emerald-600">
+                <p className="text-xs text-slate-500 mt-1">
                   {selectedCity?.type === 'city' ? 'Kota ' : 'Kabupaten '}{selectedCity?.name}, {selectedProvince?.name}
                 </p>
               </div>
             </div>
           )}
-        </>
+        </div>
       )}
 
       {/* Permission Dialog */}
       <Dialog open={showPermissionDialog} onOpenChange={setShowPermissionDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md rounded-2xl">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-indigo-600" />
+            <div className="w-14 h-14 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <MapPin className="w-7 h-7 text-indigo-600" />
+            </div>
+            <DialogTitle className="text-center text-xl">
               Izin Akses Lokasi
             </DialogTitle>
-            <DialogDescription className="pt-2">
+            <DialogDescription className="text-center pt-2">
               LesGo membutuhkan akses lokasi Anda untuk menemukan guru les terdekat di area Anda.
             </DialogDescription>
           </DialogHeader>
-          <div className="bg-slate-50 rounded-lg p-4 mt-2">
-            <p className="text-sm text-slate-600">
+          <div className="bg-slate-50 rounded-xl p-4 mt-4">
+            <p className="text-sm font-medium text-slate-700 mb-2">
               Data lokasi Anda digunakan untuk:
             </p>
-            <ul className="text-sm text-slate-600 mt-2 space-y-1 list-disc list-inside">
-              <li>Mencari guru les di sekitar Anda</li>
-              <li>Menghitung jarak antara Anda dan tutor</li>
-              <li>Memberikan rekomendasi tutor terdekat</li>
+            <ul className="text-sm text-slate-600 space-y-2">
+              <li className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                Mencari guru les di radius 15km dari lokasi Anda
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                Menghitung jarak antara Anda dan tutor
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                Memberikan rekomendasi tutor terdekat
+              </li>
             </ul>
           </div>
-          <div className="flex gap-3 mt-4">
+          <div className="flex gap-3 mt-5">
             <Button
               variant="outline"
               onClick={() => setShowPermissionDialog(false)}
-              className="flex-1"
+              className="flex-1 rounded-xl h-12"
             >
               Batal
             </Button>
             <Button
               onClick={confirmGpsPermission}
-              className="flex-1 bg-indigo-600 hover:bg-indigo-700"
+              className="flex-1 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 rounded-xl h-12 font-semibold"
             >
-              Izinkan Akses Lokasi
+              Izinkan Akses
             </Button>
           </div>
         </DialogContent>
@@ -542,3 +566,4 @@ export function WilayahLocationPicker({ onChange, value }: WilayahLocationPicker
     </div>
   );
 }
+
