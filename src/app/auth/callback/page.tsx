@@ -74,18 +74,44 @@ export default function AuthCallbackPage() {
       }
 
       // Check tutor profile status
-      const { data: tutorProfile } = await supabase
+      const { data: tutorProfile, error: tutorError } = await supabase
         .from('tutor_profiles')
         .select('is_onboarded, is_active')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
+
+      if (tutorError) {
+        console.error('Error fetching tutor profile:', tutorError);
+      }
 
       setStatus('success');
 
-      if (!tutorProfile?.is_onboarded) {
+      // Debug logging
+      console.log('Tutor login:', {
+        userId: user.id,
+        hasTutorProfile: !!tutorProfile,
+        is_onboarded: tutorProfile?.is_onboarded,
+        is_active: tutorProfile?.is_active,
+      });
+
+      if (!tutorProfile) {
+        // No tutor profile found - create one and redirect to complete registration
+        console.log('Creating tutor profile for existing user...');
+        await supabase.from('tutor_profiles').insert({
+          user_id: user.id,
+          bio: '',
+          subjects: [],
+          hourly_rate: 0,
+          is_verified: false,
+          is_active: false,
+          is_onboarded: false,
+        });
         setMessage('Lengkapi data tutor Anda...');
         setTimeout(() => router.push('/tutor/complete-registration'), 1500);
-      } else if (!tutorProfile?.is_active) {
+      } else if (!tutorProfile.is_onboarded) {
+        setMessage('Lengkapi data tutor Anda...');
+        setTimeout(() => router.push('/tutor/complete-registration'), 1500);
+      } else if (!tutorProfile.is_active) {
         setMessage('Menunggu verifikasi admin...');
         setTimeout(() => router.push('/tutor/pending-approval'), 1500);
       } else {
