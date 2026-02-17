@@ -16,6 +16,8 @@ import {
   UserX,
   MapPin,
   BookOpen,
+  List,
+  Calendar,
 } from 'lucide-react';
 
 interface DashboardStats {
@@ -156,14 +158,30 @@ export default function AdminDashboardPage() {
               <p className="text-xs text-slate-500">LesGo Management</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              onClick={() => router.push('/admin/tutors')}
+              className="hidden md:flex items-center gap-2"
+            >
+              <List className="w-4 h-4" />
+              Daftar Tutor
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => router.push('/admin/bookings')}
+              className="hidden md:flex items-center gap-2"
+            >
+              <Calendar className="w-4 h-4" />
+              Daftar Booking
+            </Button>
             <Button
               variant="outline"
               onClick={() => router.push('/admin/tutor-approvals')}
               className="hidden sm:flex items-center gap-2"
             >
               <UserCheck className="w-4 h-4" />
-              Verifikasi Tutor
+              Verifikasi
               {stats.pendingApprovals > 0 && (
                 <span className="ml-1 px-2 py-0.5 bg-red-500 text-white text-xs rounded-full">
                   {stats.pendingApprovals}
@@ -227,46 +245,78 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-6 text-white">
-            <div className="flex items-start justify-between">
-              <div>
-                <h3 className="font-semibold text-lg mb-1">Verifikasi Tutor</h3>
-                <p className="text-indigo-100 text-sm mb-4">
-                  {stats.pendingApprovals > 0
-                    ? `Ada ${stats.pendingApprovals} tutor menunggu persetujuan`
-                    : 'Tidak ada tutor yang menunggu persetujuan'}
-                </p>
-              </div>
+            <div className="flex items-start justify-between mb-4">
               <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
                 <UserCheck className="w-6 h-6" />
               </div>
             </div>
+            <h3 className="font-semibold mb-1">Verifikasi Tutor</h3>
+            <p className="text-indigo-100 text-sm mb-4">
+              {stats.pendingApprovals > 0
+                ? `${stats.pendingApprovals} menunggu`
+                : 'Tidak ada yang menunggu'}
+            </p>
             <Button
               onClick={() => router.push('/admin/tutor-approvals')}
-              className="bg-white text-indigo-600 hover:bg-indigo-50"
+              className="w-full bg-white text-indigo-600 hover:bg-indigo-50"
             >
-              Kelola Verifikasi
+              Kelola
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
 
           <div className="bg-white rounded-xl border border-slate-200 p-6">
             <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="font-semibold text-slate-900">Cari Tutor</h3>
-                <p className="text-slate-500 text-sm">Lihat semua tutor yang terdaftar</p>
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <List className="w-6 h-6 text-blue-600" />
               </div>
+            </div>
+            <h3 className="font-semibold text-slate-900 mb-1">Daftar Tutor</h3>
+            <p className="text-slate-500 text-sm mb-4">Lihat semua tutor</p>
+            <Button
+              variant="outline"
+              onClick={() => router.push('/admin/tutors')}
+              className="w-full"
+            >
+              Lihat
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
+
+          <div className="bg-white rounded-xl border border-slate-200 p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-purple-600" />
+              </div>
+            </div>
+            <h3 className="font-semibold text-slate-900 mb-1">Daftar Booking</h3>
+            <p className="text-slate-500 text-sm mb-4">{stats.totalBookings} booking</p>
+            <Button
+              variant="outline"
+              onClick={() => router.push('/admin/bookings')}
+              className="w-full"
+            >
+              Lihat
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
+
+          <div className="bg-white rounded-xl border border-slate-200 p-6">
+            <div className="flex items-start justify-between mb-4">
               <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center">
                 <MapPin className="w-6 h-6 text-slate-600" />
               </div>
             </div>
+            <h3 className="font-semibold text-slate-900 mb-1">Cari Tutor</h3>
+            <p className="text-slate-500 text-sm mb-4">Cari di peta</p>
             <Button
               variant="outline"
               onClick={() => router.push('/parent/search')}
               className="w-full"
             >
-              Lihat Daftar Tutor
+              Cari
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
