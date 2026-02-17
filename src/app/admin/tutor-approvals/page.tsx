@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, XCircle, User, MapPin, GraduationCap, Clock, Loader2, Phone, Calendar, Building2 } from 'lucide-react';
+import { CheckCircle2, XCircle, User, MapPin, GraduationCap, Clock, Loader2, Phone, Calendar, Building2, Mail, CheckIcon, XIcon } from 'lucide-react';
 
 interface PendingTutor {
   id: string;
@@ -32,6 +32,12 @@ interface PendingTutor {
   }[];
 }
 
+interface NotificationState {
+  show: boolean;
+  type: 'success' | 'error';
+  message: string;
+}
+
 const daysOfWeek = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
 // Helper function to get public URL for storage files
@@ -39,12 +45,9 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://eqmolmghcn
 
 const getStorageUrl = (path: string | null) => {
   if (!path) return null;
-  // If already a full URL, return as is
   if (path.startsWith('http')) return path;
-  // Construct direct public URL - only encode the filename, not the path separators
   const parts = path.split('/');
   const encodedParts = parts.map((part, index) => {
-    // Don't encode folder names, only the actual filename at the end
     if (index === parts.length - 1) {
       return encodeURIComponent(part);
     }
@@ -60,10 +63,18 @@ export default function TutorApprovalsPage() {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState<string | null>(null);
   const [selectedTutor, setSelectedTutor] = useState<PendingTutor | null>(null);
+  const [notification, setNotification] = useState<NotificationState>({ show: false, type: 'success', message: '' });
 
   useEffect(() => {
     fetchPendingTutors();
   }, []);
+
+  const showNotification = (type: 'success' | 'error', message: string) => {
+    setNotification({ show: true, type, message });
+    setTimeout(() => {
+      setNotification({ show: false, type, message: '' });
+    }, 5000);
+  };
 
   const fetchPendingTutors = async () => {
     try {
@@ -73,7 +84,6 @@ export default function TutorApprovalsPage() {
         return;
       }
 
-      // Check if user is admin (you can add role check here)
       const { data: profile } = await supabase
         .from('profiles')
         .select('role')
@@ -97,7 +107,6 @@ export default function TutorApprovalsPage() {
 
       if (error) throw error;
 
-      // Fetch availability for each tutor
       const tutorsWithAvailability = await Promise.all(
         (data || []).map(async (tutor: Record<string, unknown>) => {
           const { data: availability, error: availError } = await supabase
@@ -108,8 +117,6 @@ export default function TutorApprovalsPage() {
           if (availError) {
             console.error('Error fetching availability for tutor', tutor.user_id, availError);
           }
-
-          console.log('Tutor:', tutor.user_id, 'Availability:', availability);
 
           return {
             ...tutor,
@@ -127,12 +134,29 @@ export default function TutorApprovalsPage() {
       setTutors(tutorsWithAvailability as PendingTutor[]);
     } catch (error) {
       console.error('Error fetching tutors:', error);
+      showNotification('error', 'Gagal memuat data tutor');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleApprove = async (tutorId: string) => {
+  const sendEmailNotification = async (email: string, name: string, status: 'approved' | 'rejected') => {
+    try {
+      const response = await fetch('/api/admin/send-notification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, name, status }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to send email notification');
+      }
+    } catch (error) {
+      console.error('Error sending email:', error);
+    }
+  };
+
+  const handleApprove = async (tutorId: string, tutorEmail: string, tutorName: string) => {
     setProcessing(tutorId);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -149,18 +173,24 @@ export default function TutorApprovalsPage() {
 
       if (error) throw error;
 
+      // Send email notification
+      await sendEmailNotification(tutorEmail, tutorName, 'approved');
+
+      showNotification('success', `Tutor ${tutorName} berhasil disetujui! Email notifikasi telah dikirim.`);
+
       // Refresh list
       await fetchPendingTutors();
       setSelectedTutor(null);
     } catch (error) {
       console.error('Error approving tutor:', error);
+      showNotification('error', 'Gagal menyetujui tutor. Silakan coba lagi.');
     } finally {
       setProcessing(null);
     }
   };
 
-  const handleReject = async (tutorId: string) => {
-    if (!confirm('Yakin ingin menolak tutor ini?')) return;
+  const handleReject = async (tutorId: string, tutorEmail: string, tutorName: string) => {
+    if (!confirm(`Yakin ingin menolak tutor ${tutorName}?`)) return;
 
     setProcessing(tutorId);
     try {
@@ -174,10 +204,16 @@ export default function TutorApprovalsPage() {
 
       if (error) throw error;
 
+      // Send email notification
+      await sendEmailNotification(tutorEmail, tutorName, 'rejected');
+
+      showNotification('success', `Tutor ${tutorName} telah ditolak. Email notifikasi telah dikirim.`);
+
       await fetchPendingTutors();
       setSelectedTutor(null);
     } catch (error) {
       console.error('Error rejecting tutor:', error);
+      showNotification('error', 'Gagal menolak tutor. Silakan coba lagi.');
     } finally {
       setProcessing(null);
     }
@@ -193,6 +229,22 @@ export default function TutorApprovalsPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Notification Toast */}
+      {notification.show && (
+        <div className={`fixed top-4 right-4 z-50 p-4 rounded-xl shadow-lg max-w-md animate-fade-in ${
+          notification.type === 'success' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'
+        }`}>
+          <div className="flex items-center gap-3">
+            {notification.type === 'success' ? (
+              <CheckIcon className="w-5 h-5" />
+            ) : (
+              <XIcon className="w-5 h-5" />
+            )}
+            <p className="font-medium">{notification.message}</p>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="bg-white border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -245,14 +297,13 @@ export default function TutorApprovalsPage() {
                       variant="outline"
                       onClick={() => {
                         console.log('Selected tutor:', tutor);
-                        console.log('Availability:', tutor.availability);
                         setSelectedTutor(tutor);
                       }}
                     >
                       Lihat Detail
                     </Button>
                     <Button
-                      onClick={() => handleApprove(tutor.user_id)}
+                      onClick={() => handleApprove(tutor.user_id, tutor.email, tutor.name)}
                       disabled={processing === tutor.user_id}
                       className="bg-emerald-500 hover:bg-emerald-600"
                     >
@@ -264,7 +315,7 @@ export default function TutorApprovalsPage() {
                     </Button>
                     <Button
                       variant="outline"
-                      onClick={() => handleReject(tutor.user_id)}
+                      onClick={() => handleReject(tutor.user_id, tutor.email, tutor.name)}
                       disabled={processing === tutor.user_id}
                       className="border-red-200 text-red-600 hover:bg-red-50"
                     >
@@ -426,14 +477,15 @@ export default function TutorApprovalsPage() {
             <div className="p-6 border-t border-slate-200 flex justify-end gap-3">
               <Button
                 variant="outline"
-                onClick={() => handleReject(selectedTutor.user_id)}
+                onClick={() => handleReject(selectedTutor.user_id, selectedTutor.email, selectedTutor.name)}
                 disabled={processing === selectedTutor.user_id}
                 className="border-red-200 text-red-600 hover:bg-red-50"
               >
+                <XCircle className="w-4 h-4 mr-2" />
                 Tolak
               </Button>
               <Button
-                onClick={() => handleApprove(selectedTutor.user_id)}
+                onClick={() => handleApprove(selectedTutor.user_id, selectedTutor.email, selectedTutor.name)}
                 disabled={processing === selectedTutor.user_id}
                 className="bg-emerald-500 hover:bg-emerald-600"
               >
