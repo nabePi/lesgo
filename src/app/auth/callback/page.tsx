@@ -65,7 +65,15 @@ export default function AuthCallbackPage() {
         return;
       }
 
-      // Existing user - check tutor profile status
+      // Existing user - check role first
+      if (existingProfile.role === 'admin') {
+        setStatus('success');
+        setMessage('Login berhasil! Mengalihkan...');
+        setTimeout(() => router.push('/admin'), 1500);
+        return;
+      }
+
+      // Check tutor profile status
       const { data: tutorProfile } = await supabase
         .from('tutor_profiles')
         .select('is_onboarded, is_active')

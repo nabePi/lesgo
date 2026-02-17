@@ -83,9 +83,23 @@ export function LoginForm() {
         setError(error.message);
       } else {
         setStep('success');
-        setTimeout(() => {
-          window.location.href = '/parent/search';
-        }, 1000);
+        // Check user role and redirect accordingly
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+
+          setTimeout(() => {
+            if (profile?.role === 'admin') {
+              window.location.href = '/admin';
+            } else {
+              window.location.href = '/parent/search';
+            }
+          }, 1000);
+        }
       }
     } catch (err) {
       setError('Terjadi kesalahan. Silakan coba lagi.');
