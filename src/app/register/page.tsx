@@ -1,10 +1,98 @@
-import { RegisterForm } from '@/components/auth/RegisterForm';
-import { GraduationCap } from 'lucide-react';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import { Button } from '@/components/ui/button';
+import { GraduationCap, Chrome, Loader2, ArrowLeft, CheckCircle2, User, Building2 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Check if already logged in
+    checkUser();
+  }, []);
+
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      // Check if tutor profile exists
+      const { data: tutor } = await supabase
+        .from('tutor_profiles')
+        .select('is_onboarded, is_active')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!tutor) {
+        // New tutor - create basic profile and redirect to complete registration
+        await createTutorProfile(user.id, user.email || '', user.user_metadata?.full_name || '');
+        router.push('/tutor/complete-registration');
+      } else if (!tutor.is_onboarded) {
+        router.push('/tutor/complete-registration');
+      } else if (!tutor.is_active) {
+        router.push('/tutor/pending-approval');
+      } else {
+        router.push('/tutor/dashboard');
+      }
+    }
+  };
+
+  const createTutorProfile = async (userId: string, email: string, name: string) => {
+    // Create profile
+    await supabase.from('profiles').insert({
+      id: userId,
+      name: name || 'Tutor',
+      email: email,
+      phone: '',
+      role: 'tutor',
+    });
+
+    // Create basic tutor profile
+    await supabase.from('tutor_profiles').insert({
+      user_id: userId,
+      bio: '',
+      subjects: [],
+      hourly_rate: 0,
+      is_verified: false,
+      is_active: false,
+      is_onboarded: false,
+    });
+  };
+
+  const handleGoogleRegister = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Gagal daftar dengan Google');
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-indigo-50/50 to-background">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-indigo-50/50 to-white">
+      {/* Back Button */}
+      <Link
+        href="/"
+        className="absolute top-4 left-4 flex items-center gap-2 text-slate-600 hover:text-indigo-600 transition-colors"
+      >
+        <ArrowLeft className="w-5 h-5" />
+        <span className="font-medium">Kembali</span>
+      </Link>
+
       {/* Logo */}
       <div className="mb-8 text-center">
         <Link href="/" className="inline-flex items-center gap-2">
@@ -17,19 +105,73 @@ export default function RegisterPage() {
 
       {/* Form Container */}
       <div className="w-full max-w-md">
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-slate-900">Buat Akun Baru</h1>
-          <p className="text-slate-500 mt-1">Bergabung dengan ribuan tutor dan orang tua</p>
-        </div>
-        <RegisterForm />
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-xl p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-slate-900">Daftar sebagai Tutor</h1>
+            <p className="text-slate-500 mt-2">
+              Bergabung sebagai tutor les private dan mulai mengajar
+            </p>
+          </div>
 
-        {/* Footer */}
-        <p className="text-center text-sm text-slate-500 mt-6">
-          Sudah punya akun?{' '}
-          <Link href="/login" className="text-indigo-600 font-semibold hover:text-indigo-700">
-            Masuk
-          </Link>
-        </p>
+          {/* Benefits */}
+          <div className="space-y-3 mb-8">
+            <div className="flex items-center gap-3 text-sm text-slate-600">
+              <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              </div>
+              <span>Penghasilan tambahan dari mengajar</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm text-slate-600">
+              <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+                <User className="w-4 h-4 text-emerald-600" />
+              </div>
+              <span>Atur jadwal mengajar sesuai waktu luang</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm text-slate-600">
+              <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+                <Building2 className="w-4 h-4 text-emerald-600" />
+              </div>
+              <span>Dapatkan siswa di sekitar lokasi Anda</span>
+            </div>
+          </div>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+          )}
+
+          <Button
+            onClick={handleGoogleRegister}
+            disabled={loading}
+            className="w-full h-14 text-base font-semibold bg-white border-2 border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300"
+          >
+            {loading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <>
+                <Chrome className="w-5 h-5 mr-3 text-red-500" />
+                Daftar dengan Google
+              </>
+            )}
+          </Button>
+
+          <div className="mt-8 text-center">
+            <p className="text-sm text-slate-500">
+              Sudah punya akun?{' '}
+              <Link href="/login" className="text-indigo-600 font-semibold hover:text-indigo-700">
+                Masuk sekarang
+              </Link>
+            </p>
+          </div>
+
+          <div className="mt-6 pt-6 border-t border-slate-100">
+            <p className="text-xs text-center text-slate-400">
+              Dengan mendaftar, Anda menyetujui syarat dan ketentuan sebagai tutor LesGo.
+              Data Anda akan diverifikasi sebelum akun diaktifkan.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
