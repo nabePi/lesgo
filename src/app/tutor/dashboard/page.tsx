@@ -1,42 +1,76 @@
-import { supabaseServer } from '@/lib/supabase-server';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
 import { BookingRequests } from '@/components/tutor/BookingRequests';
 import { EarningsCard } from '@/components/tutor/EarningsCard';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { GraduationCap, LogOut, LayoutDashboard, User, Settings } from 'lucide-react';
+import { GraduationCap, LogOut, LayoutDashboard, Settings, Loader2 } from 'lucide-react';
+import type { Booking } from '@/types';
 
-export default async function TutorDashboard() {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-      },
+interface Wallet {
+  balance: number;
+  total_earned: number;
+}
+
+export default function TutorDashboard() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [wallet, setWallet] = useState<Wallet>({ balance: 0, total_earned: 0 });
+
+  useEffect(() => {
+    checkAuthAndLoadData();
+  }, []);
+
+  const checkAuthAndLoadData = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        router.push('/login');
+        return;
+      }
+
+      // Load bookings
+      const { data: bookingsData } = await supabase
+        .from('bookings')
+        .select('*, parent:profiles!parent_id(*)')
+        .eq('tutor_id', user.id)
+        .order('created_at', { ascending: false });
+
+      // Load wallet
+      const { data: walletData } = await supabase
+        .from('tutor_wallets')
+        .select('*')
+        .eq('tutor_id', user.id)
+        .maybeSingle();
+
+      setBookings(bookingsData || []);
+      setWallet({
+        balance: walletData?.balance || 0,
+        total_earned: walletData?.total_earned || 0,
+      });
+    } catch (error) {
+      console.error('Error loading dashboard:', error);
+    } finally {
+      setLoading(false);
     }
-  );
-  const { data: { session } } = await supabase.auth.getSession();
+  };
 
-  if (!session) {
-    redirect('/login');
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+      </div>
+    );
   }
-
-  const { data: bookings } = await supabaseServer
-    .from('bookings')
-    .select('*, parent:profiles!parent_id(*)')
-    .eq('tutor_id', session.user.id)
-    .order('created_at', { ascending: false });
-
-  const { data: wallet } = await supabaseServer
-    .from('tutor_wallets')
-    .select('*')
-    .eq('tutor_id', session.user.id)
-    .single();
 
   return (
     <div className="min-h-screen bg-background">
@@ -54,14 +88,12 @@ export default async function TutorDashboard() {
             <button className="p-2 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
               <Settings className="w-5 h-5" />
             </button>
-            <form action="/api/auth/signout" method="post">
-              <button
-                type="submit"
-                className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              >
-                <LogOut className="w-5 h-5" />
-              </button>
-            </form>
+            <button
+              onClick={handleLogout}
+              className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </header>
@@ -74,7 +106,7 @@ export default async function TutorDashboard() {
         </div>
 
         {/* Earnings */}
-        <EarningsCard balance={wallet?.balance || 0} totalEarned={wallet?.total_earned || 0} />
+        <EarningsCard balance={wallet.balance} totalEarned={wallet.total_earned} />
 
         {/* Navigation Pills */}
         <div className="flex gap-2 mt-6 overflow-x-auto pb-2">
@@ -98,7 +130,7 @@ export default async function TutorDashboard() {
             <LayoutDashboard className="w-5 h-5 text-indigo-600" />
             Permintaan Booking
           </h2>
-          <BookingRequests bookings={bookings || []} />
+          <BookingRequests bookings={bookings} />
         </div>
       </main>
     </div>

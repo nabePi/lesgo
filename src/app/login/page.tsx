@@ -20,34 +20,44 @@ export default function LoginPage() {
   const checkUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      redirectBasedOnRole(user.id);
+      await redirectBasedOnRole(user.id);
     }
   };
 
   const redirectBasedOnRole = async (userId: string) => {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', userId)
-      .single();
-
-    if (profile?.role === 'tutor') {
-      // Check if tutor has completed onboarding
-      const { data: tutor } = await supabase
-        .from('tutor_profiles')
-        .select('is_onboarded, is_active')
-        .eq('user_id', userId)
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', userId)
         .single();
 
-      if (!tutor?.is_onboarded) {
-        router.push('/tutor/complete-registration');
-      } else if (!tutor?.is_active) {
-        router.push('/tutor/pending-approval');
-      } else {
-        router.push('/tutor/dashboard');
+      if (profile?.role === 'admin') {
+        router.push('/admin');
+        return;
       }
-    } else {
-      router.push('/parent/search');
+
+      if (profile?.role === 'tutor') {
+        // Check if tutor has completed onboarding
+        const { data: tutor } = await supabase
+          .from('tutor_profiles')
+          .select('is_onboarded, is_active')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        if (!tutor || !tutor.is_onboarded) {
+          router.push('/tutor/complete-registration');
+        } else if (!tutor.is_active) {
+          router.push('/tutor/pending-approval');
+        } else {
+          router.push('/tutor/dashboard');
+        }
+      } else {
+        router.push('/parent/search');
+      }
+    } catch (error) {
+      console.error('Error redirecting:', error);
+      // If error, stay on login page
     }
   };
 
