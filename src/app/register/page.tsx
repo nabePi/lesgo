@@ -47,7 +47,7 @@ export default function RegisterPage() {
       id: userId,
       name: name || 'Tutor',
       email: email,
-      phone: '',
+      whatsapp: '',
       role: 'tutor',
     });
 

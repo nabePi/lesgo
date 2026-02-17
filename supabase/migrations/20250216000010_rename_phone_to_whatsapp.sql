@@ -1,4 +1,17 @@
--- Function to link anonymous bookings to a user when they sign up with WhatsApp
+-- Rename phone references to whatsapp in RLS policies and functions
+
+-- Update RLS policy in bookings table
+DROP POLICY IF EXISTS "Parents can view own bookings" ON public.bookings;
+CREATE POLICY "Parents can view own bookings"
+  ON public.bookings
+  FOR SELECT
+  TO authenticated
+  USING (
+    parent_id = auth.uid() OR
+    parent_whatsapp = (SELECT whatsapp FROM public.profiles WHERE id = auth.uid())
+  );
+
+-- Update function to link bookings by whatsapp
 CREATE OR REPLACE FUNCTION link_bookings_by_whatsapp()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -12,14 +25,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Trigger to auto-link bookings when a profile is created
-DROP TRIGGER IF EXISTS link_bookings_on_profile_create ON public.profiles;
-CREATE TRIGGER link_bookings_on_profile_create
-  AFTER INSERT ON public.profiles
-  FOR EACH ROW
-  EXECUTE FUNCTION link_bookings_by_whatsapp();
+-- Rename and update trigger function for whatsapp updates
+DROP TRIGGER IF EXISTS link_bookings_on_phone_update ON public.profiles;
+DROP FUNCTION IF EXISTS link_bookings_on_phone_update();
 
--- Also link when whatsapp number is updated
 CREATE OR REPLACE FUNCTION link_bookings_on_whatsapp_update()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -35,14 +44,15 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Create new trigger for whatsapp updates
 DROP TRIGGER IF EXISTS link_bookings_on_whatsapp_update ON public.profiles;
 CREATE TRIGGER link_bookings_on_whatsapp_update
   AFTER UPDATE ON public.profiles
   FOR EACH ROW
   EXECUTE FUNCTION link_bookings_on_whatsapp_update();
 
--- View for users to see their complete booking history
--- Includes both linked bookings (by parent_id) and anonymous bookings (by phone match)
+-- Update user_booking_history view
+DROP VIEW IF EXISTS user_booking_history;
 CREATE OR REPLACE VIEW user_booking_history AS
 SELECT
   b.*,
@@ -60,3 +70,6 @@ WHERE b.parent_id = auth.uid()
 
 -- Enable RLS on the view
 ALTER VIEW user_booking_history OWNER TO postgres;
+
+-- Update comment
+COMMENT ON COLUMN public.bookings.parent_whatsapp IS 'WhatsApp number for parent communication and future login identification';

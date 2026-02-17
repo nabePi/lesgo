@@ -32,7 +32,7 @@ CREATE POLICY "Parents can view own bookings"
   TO authenticated
   USING (
     parent_id = auth.uid() OR
-    parent_whatsapp = (SELECT phone FROM public.profiles WHERE id = auth.uid())
+    parent_whatsapp = (SELECT whatsapp FROM public.profiles WHERE id = auth.uid())
   );
 
 -- Add comment explaining the WhatsApp field usage

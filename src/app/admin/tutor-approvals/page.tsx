@@ -149,7 +149,11 @@ export default function TutorApprovalsPage() {
       });
 
       if (!response.ok) {
-        console.error('Failed to send email notification');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Failed to send email notification:', errorData);
+      } else {
+        const data = await response.json();
+        console.log('Email notification result:', data);
       }
     } catch (error) {
       console.error('Error sending email:', error);
@@ -160,8 +164,9 @@ export default function TutorApprovalsPage() {
     setProcessing(tutorId);
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      console.log('Approving tutor:', { tutorId, tutorEmail, tutorName, adminUserId: user?.id });
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('tutor_profiles')
         .update({
           is_active: true,
@@ -169,7 +174,10 @@ export default function TutorApprovalsPage() {
           approved_at: new Date().toISOString(),
           approved_by: user?.id,
         })
-        .eq('user_id', tutorId);
+        .eq('user_id', tutorId)
+        .select();
+
+      console.log('Update result:', { data, error });
 
       if (error) throw error;
 

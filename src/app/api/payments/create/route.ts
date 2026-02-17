@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     customer_details: {
       first_name: booking.parent.name,
       email: booking.parent.email,
-      phone: booking.parent.phone,
+      phone: booking.parent.whatsapp,
     },
     item_details: [
       {

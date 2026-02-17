@@ -4,7 +4,8 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const APP_NAME = 'LesGo';
-const FROM_EMAIL = 'LesGo <noreply@lesgo.id>';
+// Use verified domain for sending emails
+const FROM_EMAIL = process.env.FROM_EMAIL || 'LesGo <noreply@bangundiri.id>';
 
 interface EmailRequest {
   email: string;
@@ -117,7 +118,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      console.error('Resend email error:', error);
+      console.error('Resend email error:', JSON.stringify(error, null, 2));
       return NextResponse.json(
         { error: 'Failed to send email', details: error },
         { status: 500 }

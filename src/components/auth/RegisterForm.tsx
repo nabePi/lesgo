@@ -17,11 +17,11 @@ export function RegisterForm() {
   const [role, setRole] = useState<UserRole>('parent');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const formatPhoneNumber = (value: string) => {
+  const formatWhatsappNumber = (value: string) => {
     const numeric = value.replace(/\D/g, '');
     if (numeric.startsWith('0')) {
       return '+62' + numeric.slice(1);
@@ -32,9 +32,9 @@ export function RegisterForm() {
     return numeric.startsWith('+') ? numeric : '+62' + numeric;
   };
 
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatPhoneNumber(e.target.value);
-    setPhone(formatted);
+  const handleWhatsappChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatWhatsappNumber(e.target.value);
+    setWhatsapp(formatted);
     setError(null);
   };
 
@@ -47,8 +47,8 @@ export function RegisterForm() {
       setError('Email tidak valid');
       return false;
     }
-    if (phone.length < 10) {
-      setError('Nomor telepon tidak valid');
+    if (whatsapp.length < 10) {
+      setError('Nomor WhatsApp tidak valid');
       return false;
     }
     return true;
@@ -62,7 +62,7 @@ export function RegisterForm() {
 
     try {
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        phone,
+        phone: whatsapp,
         password: Math.random().toString(36).slice(-8),
       });
 
@@ -76,7 +76,7 @@ export function RegisterForm() {
         id: authData.user.id,
         name: name.trim(),
         email: email.trim(),
-        phone,
+        whatsapp,
         role,
       });
 
@@ -191,15 +191,15 @@ export function RegisterForm() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone" className="text-slate-700 flex items-center gap-2">
+                <Label htmlFor="whatsapp" className="text-slate-700 flex items-center gap-2">
                   <Phone className="w-4 h-4" />
                   Nomor WhatsApp
                 </Label>
                 <Input
-                  id="phone"
+                  id="whatsapp"
                   type="tel"
-                  value={phone}
-                  onChange={handlePhoneChange}
+                  value={whatsapp}
+                  onChange={handleWhatsappChange}
                   placeholder="+6281234567890"
                   className="h-11"
                 />

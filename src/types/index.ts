@@ -3,7 +3,7 @@ export type UserRole = 'parent' | 'tutor';
 export interface Profile {
   id: string;
   name: string;
-  phone: string;
+  whatsapp: string;
   email: string;
   role: UserRole;
   avatar_url?: string;

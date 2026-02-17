@@ -42,7 +42,7 @@ export default function AuthCallbackPage() {
           id: user.id,
           name: user.user_metadata?.full_name || user.user_metadata?.name || 'Tutor',
           email: user.email || '',
-          phone: user.user_metadata?.phone || '',
+          whatsapp: user.user_metadata?.phone || '',
           role: 'tutor',
         });
 
