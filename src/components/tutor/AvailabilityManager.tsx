@@ -122,15 +122,21 @@ export function AvailabilityManager({ tutorId }: AvailabilityManagerProps) {
   };
 
   const toggleSlot = async (slotId: string, currentStatus: boolean) => {
+    console.log('Toggling slot:', slotId, 'from', currentStatus, 'to', !currentStatus);
     setSaving(true);
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('tutor_availability')
         .update({ is_active: !currentStatus })
-        .eq('id', slotId);
+        .eq('id', slotId)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
 
+      console.log('Toggle success:', data);
       await loadAvailability();
     } catch (error) {
       console.error('Error updating slot:', error);
@@ -293,24 +299,35 @@ export function AvailabilityManager({ tutorId }: AvailabilityManagerProps) {
                       </div>
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => toggleSlot(slot.id, slot.is_active)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log('Toggle clicked:', slot.id, 'current status:', slot.is_active);
+                            toggleSlot(slot.id, slot.is_active);
+                          }}
                           disabled={saving}
-                          className="p-1 hover:bg-white rounded transition-colors"
+                          className="p-2 hover:bg-white rounded-lg transition-all active:scale-95 disabled:opacity-50"
                           title={slot.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+                          type="button"
                         >
                           {slot.is_active ? (
-                            <ToggleRight className="w-6 h-6 text-emerald-600" />
+                            <ToggleRight className="w-8 h-8 text-emerald-600" />
                           ) : (
-                            <ToggleLeft className="w-6 h-6 text-slate-400" />
+                            <ToggleLeft className="w-8 h-8 text-slate-400" />
                           )}
                         </button>
                         <button
-                          onClick={() => removeSlot(slot.id)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            removeSlot(slot.id);
+                          }}
                           disabled={saving}
-                          className="p-1 hover:bg-red-50 rounded transition-colors"
+                          className="p-2 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                           title="Hapus"
+                          type="button"
                         >
-                          <Trash2 className="w-4 h-4 text-red-500" />
+                          <Trash2 className="w-5 h-5 text-red-500" />
                         </button>
                       </div>
                     </div>
