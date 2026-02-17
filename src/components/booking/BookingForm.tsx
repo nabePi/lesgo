@@ -5,15 +5,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/lib/supabase';
-import { BookOpen, Calendar, Clock, MapPin, Clock3, Loader2, ArrowRight, Info } from 'lucide-react';
+import { BookOpen, Calendar, Clock, MapPin, Clock3, Loader2, ArrowRight, Info, User, Phone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface BookingFormProps {
   tutorId: string;
   hourlyRate: number;
+  tutorName?: string;
 }
 
-export function BookingForm({ tutorId, hourlyRate }: BookingFormProps) {
+export function BookingForm({ tutorId, hourlyRate, tutorName }: BookingFormProps) {
+  const [parentName, setParentName] = useState('');
+  const [parentWhatsApp, setParentWhatsApp] = useState('');
   const [subject, setSubject] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
@@ -27,6 +30,8 @@ export function BookingForm({ tutorId, hourlyRate }: BookingFormProps) {
   const tutorEarnings = totalAmount - commission;
 
   const validateForm = () => {
+    if (!parentName.trim()) return 'Nama wajib diisi';
+    if (!parentWhatsApp.trim()) return 'Nomor WhatsApp wajib diisi';
     if (!subject.trim()) return 'Mata pelajaran wajib diisi';
     if (!date) return 'Tanggal wajib diisi';
     if (!time) return 'Waktu wajib diisi';
@@ -45,16 +50,10 @@ export function BookingForm({ tutorId, hourlyRate }: BookingFormProps) {
     setError(null);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setError('Silakan login terlebih dahulu');
-        setLoading(false);
-        return;
-      }
-
       const { data, error: bookingError } = await supabase.from('bookings').insert({
-        parent_id: user.id,
         tutor_id: tutorId,
+        parent_name: parentName,
+        parent_whatsapp: parentWhatsApp,
         subject,
         session_date: date,
         session_time: time,
@@ -81,7 +80,56 @@ export function BookingForm({ tutorId, hourlyRate }: BookingFormProps) {
   const durationOptions = [1, 1.5, 2, 2.5, 3, 3.5, 4];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
+      {/* Welcome Message */}
+      {tutorName && (
+        <div className="bg-indigo-50 rounded-xl p-4 border border-indigo-100">
+          <p className="text-sm text-indigo-800">
+            <span className="font-semibold">Booking Sesi dengan {tutorName}</span>
+          </p>
+          <p className="text-xs text-indigo-600 mt-1">
+            Isi data Anda di bawah ini untuk memesan sesi les
+          </p>
+        </div>
+      )}
+
+      {/* Parent Contact Info */}
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="parentName" className="flex items-center gap-2 text-slate-700">
+            <User className="w-4 h-4" />
+            Nama Anda <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="parentName"
+            value={parentName}
+            onChange={(e) => { setParentName(e.target.value); setError(null); }}
+            placeholder="Contoh: Budi Santoso"
+            className="h-11"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="parentWhatsApp" className="flex items-center gap-2 text-slate-700">
+            <Phone className="w-4 h-4" />
+            Nomor WhatsApp <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="parentWhatsApp"
+            type="tel"
+            value={parentWhatsApp}
+            onChange={(e) => { setParentWhatsApp(e.target.value); setError(null); }}
+            placeholder="Contoh: 08123456789"
+            className="h-11"
+          />
+          <p className="text-xs text-slate-500">
+            Nomor ini akan digunakan untuk komunikasi dan login di masa depan
+          </p>
+        </div>
+      </div>
+
+      <div className="h-px bg-slate-200" />
+
       {/* Subject */}
       <div className="space-y-2">
         <Label htmlFor="subject" className="flex items-center gap-2 text-slate-700">

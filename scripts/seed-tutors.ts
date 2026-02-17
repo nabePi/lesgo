@@ -252,6 +252,26 @@ const sampleTutors = [
     district_id: '31.72.06',
     village_id: '31.72.06.1001',
   },
+  // Tutor at Sudana Homestay, Bali
+  {
+    email: 'ketut.suardana@example.com',
+    name: 'Ketut Suardana',
+    phone: '081234567013',
+    bio: 'Guru matematika dan fisika berpengalaman 8 tahun di Bali. Spesialis persiapan UN dan SNBT. Metode pengajaran yang sabar dan mudah dipahami.',
+    subjects: ['Matematika', 'Fisika'],
+    hourly_rate: 80000,
+    lat: -8.5091913,
+    lng: 115.2642271,
+    address: 'Jl. Sudamala No. 12, Sanur, Denpasar Selatan',
+    rating: 4.8,
+    total_reviews: 24,
+    is_verified: true,
+    // Bali - Kota Denpasar - Denpasar Selatan - Sanur
+    province_id: '51',
+    city_id: '51.71',
+    district_id: '51.71.03',
+    village_id: '51.71.03.1005',
+  },
 ];
 
 async function seedTutors() {

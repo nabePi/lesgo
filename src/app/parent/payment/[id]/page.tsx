@@ -1,26 +1,31 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Loader2, CreditCard, Shield, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
-export default function PaymentPage({ params }: { params: { id: string } }) {
+export default function PaymentPage() {
+  const params = useParams();
+  const bookingId = params.id as string;
   const [loading, setLoading] = useState(true);
   const [snapToken, setSnapToken] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    createPayment();
-  }, []);
+    if (bookingId) {
+      createPayment();
+    }
+  }, [bookingId]);
 
   const createPayment = async () => {
     try {
       const response = await fetch('/api/payments/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bookingId: params.id }),
+        body: JSON.stringify({ bookingId }),
       });
 
       if (!response.ok) {
@@ -29,8 +34,9 @@ export default function PaymentPage({ params }: { params: { id: string } }) {
 
       const data = await response.json();
       setSnapToken(data.token);
-    } catch {
+    } catch (err) {
       setError('Gagal memuat pembayaran. Silakan coba lagi.');
+      console.error(err);
     } finally {
       setLoading(false);
     }

@@ -20,6 +20,8 @@ export async function GET(request: NextRequest) {
   if (lat && lng) {
     const latitude = parseFloat(lat);
     const longitude = parseFloat(lng);
+    const maxDistanceParam = searchParams.get('maxDistance');
+    const MAX_DISTANCE_KM = maxDistanceParam ? parseFloat(maxDistanceParam) : 15; // Default 15km, configurable
 
     // Search all active tutors with subjects, then sort by distance
     let { data: tutors, error } = await supabaseServer
@@ -33,7 +35,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Calculate distance and sort by nearest
+    // Calculate distance, filter by max distance, and sort by nearest
     const tutorsWithDistance = (tutors || [])
       .filter(t => t.location_lat && t.location_lng)
       .map(tutor => {
@@ -45,13 +47,15 @@ export async function GET(request: NextRequest) {
         );
         return { ...tutor, distance };
       })
+      .filter(tutor => tutor.distance <= MAX_DISTANCE_KM) // Only tutors within max distance
       .sort((a, b) => a.distance - b.distance);
 
-    // Return top 20 nearest tutors
     return NextResponse.json({
-      tutors: tutorsWithDistance.slice(0, 20),
+      tutors: tutorsWithDistance,
       expanded: false,
-      gpsSearch: true
+      gpsSearch: true,
+      maxDistance: MAX_DISTANCE_KM,
+      totalFound: tutorsWithDistance.length
     });
   }
 
