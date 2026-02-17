@@ -6,8 +6,9 @@ import { BookingRequests } from '@/components/tutor/BookingRequests';
 import { EarningsCard } from '@/components/tutor/EarningsCard';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { GraduationCap, LogOut, LayoutDashboard, Settings, Loader2 } from 'lucide-react';
+import { GraduationCap, LogOut, LayoutDashboard, Settings, Loader2, Calendar } from 'lucide-react';
 import type { Booking } from '@/types';
+import { AvailabilityManager } from '@/components/tutor/AvailabilityManager';
 
 interface Wallet {
   balance: number;
@@ -19,6 +20,7 @@ export default function TutorDashboard() {
   const [loading, setLoading] = useState(true);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [wallet, setWallet] = useState<Wallet>({ balance: 0, total_earned: 0 });
+  const [tutorId, setTutorId] = useState<string>('');
 
   useEffect(() => {
     checkAuthAndLoadData();
@@ -47,6 +49,7 @@ export default function TutorDashboard() {
         .eq('tutor_id', user.id)
         .maybeSingle();
 
+      setTutorId(user.id);
       setBookings(bookingsData || []);
       setWallet({
         balance: walletData?.balance || 0,
@@ -124,8 +127,15 @@ export default function TutorDashboard() {
           </button>
         </div>
 
+        {/* Availability Manager */}
+        {tutorId && (
+          <div className="mt-8 bg-white rounded-xl border border-slate-200 p-6">
+            <AvailabilityManager tutorId={tutorId} />
+          </div>
+        )}
+
         {/* Bookings */}
-        <div className="mt-6">
+        <div className="mt-8">
           <h2 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
             <LayoutDashboard className="w-5 h-5 text-indigo-600" />
             Permintaan Booking
