@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/lib/supabase';
-import { BookOpen, Calendar, Clock, MapPin, Clock3, Loader2, ArrowRight, Info, User, Phone } from 'lucide-react';
+import { BookOpen, Calendar, Clock, MapPin, Clock3, Loader2, ArrowRight, Info, User, Phone, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface BookingFormProps {
@@ -81,13 +81,30 @@ export function BookingForm({ tutorId, hourlyRate, tutorName }: BookingFormProps
 
   return (
     <div className="space-y-5">
+      {/* Progress Step Indicator */}
+      <div className="flex items-center justify-center gap-2 mb-6">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-[#E85D4C] text-white flex items-center justify-center text-sm font-bold">
+            1
+          </div>
+          <span className="text-sm font-semibold text-[#E85D4C]">Data Diri</span>
+        </div>
+        <div className="w-12 h-px bg-[#E85D4C]" />
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-sm font-bold">
+            2
+          </div>
+          <span className="text-sm text-gray-500">Pembayaran</span>
+        </div>
+      </div>
+
       {/* Welcome Message */}
       {tutorName && (
-        <div className="bg-indigo-50 rounded-xl p-4 border border-indigo-100">
-          <p className="text-sm text-indigo-800">
+        <div className="bg-[#FEF2F0] rounded-xl p-4 border border-[#E85D4C]/20">
+          <p className="text-sm text-[#E85D4C]">
             <span className="font-semibold">Booking Sesi dengan {tutorName}</span>
           </p>
-          <p className="text-xs text-indigo-600 mt-1">
+          <p className="text-xs text-[#E85D4C]/80 mt-1">
             Isi data Anda di bawah ini untuk memesan sesi les
           </p>
         </div>
@@ -96,8 +113,8 @@ export function BookingForm({ tutorId, hourlyRate, tutorName }: BookingFormProps
       {/* Parent Contact Info */}
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="parentName" className="flex items-center gap-2 text-slate-700">
-            <User className="w-4 h-4" />
+          <Label htmlFor="parentName" className="flex items-center gap-2 text-[#1F2937]">
+            <User className="w-4 h-4 text-[#E85D4C]" />
             Nama Anda <span className="text-red-500">*</span>
           </Label>
           <Input
@@ -105,13 +122,13 @@ export function BookingForm({ tutorId, hourlyRate, tutorName }: BookingFormProps
             value={parentName}
             onChange={(e) => { setParentName(e.target.value); setError(null); }}
             placeholder="Contoh: Budi Santoso"
-            className="h-11"
+            className="h-11 rounded-xl border-gray-200 focus:border-[#E85D4C] focus:ring-[#E85D4C]"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="parentWhatsApp" className="flex items-center gap-2 text-slate-700">
-            <Phone className="w-4 h-4" />
+          <Label htmlFor="parentWhatsApp" className="flex items-center gap-2 text-[#1F2937]">
+            <Phone className="w-4 h-4 text-[#E85D4C]" />
             Nomor WhatsApp <span className="text-red-500">*</span>
           </Label>
           <Input
@@ -120,20 +137,20 @@ export function BookingForm({ tutorId, hourlyRate, tutorName }: BookingFormProps
             value={parentWhatsApp}
             onChange={(e) => { setParentWhatsApp(e.target.value); setError(null); }}
             placeholder="Contoh: 08123456789"
-            className="h-11"
+            className="h-11 rounded-xl border-gray-200 focus:border-[#E85D4C] focus:ring-[#E85D4C]"
           />
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-[#6B7280]">
             Nomor ini akan digunakan untuk komunikasi dan login di masa depan
           </p>
         </div>
       </div>
 
-      <div className="h-px bg-slate-200" />
+      <div className="h-px bg-gray-200" />
 
       {/* Subject */}
       <div className="space-y-2">
-        <Label htmlFor="subject" className="flex items-center gap-2 text-slate-700">
-          <BookOpen className="w-4 h-4" />
+        <Label htmlFor="subject" className="flex items-center gap-2 text-[#1F2937]">
+          <BookOpen className="w-4 h-4 text-[#E85D4C]" />
           Mata Pelajaran
         </Label>
         <Input
@@ -141,15 +158,15 @@ export function BookingForm({ tutorId, hourlyRate, tutorName }: BookingFormProps
           value={subject}
           onChange={(e) => { setSubject(e.target.value); setError(null); }}
           placeholder="Contoh: Matematika"
-          className="h-11"
+          className="h-11 rounded-xl border-gray-200 focus:border-[#E85D4C] focus:ring-[#E85D4C]"
         />
       </div>
 
       {/* Date & Time */}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="date" className="flex items-center gap-2 text-slate-700">
-            <Calendar className="w-4 h-4" />
+          <Label htmlFor="date" className="flex items-center gap-2 text-[#1F2937]">
+            <Calendar className="w-4 h-4 text-[#E85D4C]" />
             Tanggal
           </Label>
           <Input
@@ -157,13 +174,13 @@ export function BookingForm({ tutorId, hourlyRate, tutorName }: BookingFormProps
             type="date"
             value={date}
             onChange={(e) => { setDate(e.target.value); setError(null); }}
-            className="h-11"
+            className="h-11 rounded-xl border-gray-200 focus:border-[#E85D4C] focus:ring-[#E85D4C]"
             min={new Date().toISOString().split('T')[0]}
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="time" className="flex items-center gap-2 text-slate-700">
-            <Clock className="w-4 h-4" />
+          <Label htmlFor="time" className="flex items-center gap-2 text-[#1F2937]">
+            <Clock className="w-4 h-4 text-[#E85D4C]" />
             Waktu
           </Label>
           <Input
@@ -171,15 +188,15 @@ export function BookingForm({ tutorId, hourlyRate, tutorName }: BookingFormProps
             type="time"
             value={time}
             onChange={(e) => { setTime(e.target.value); setError(null); }}
-            className="h-11"
+            className="h-11 rounded-xl border-gray-200 focus:border-[#E85D4C] focus:ring-[#E85D4C]"
           />
         </div>
       </div>
 
       {/* Duration */}
       <div className="space-y-2">
-        <Label className="flex items-center gap-2 text-slate-700">
-          <Clock3 className="w-4 h-4" />
+        <Label className="flex items-center gap-2 text-[#1F2937]">
+          <Clock3 className="w-4 h-4 text-[#E85D4C]" />
           Durasi
         </Label>
         <div className="flex flex-wrap gap-2">
@@ -189,10 +206,10 @@ export function BookingForm({ tutorId, hourlyRate, tutorName }: BookingFormProps
               type="button"
               onClick={() => setDuration(option)}
               className={cn(
-                "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
                 duration === option
-                  ? 'bg-indigo-600 text-white shadow-md'
-                  : 'bg-white text-slate-700 border border-slate-200 hover:border-indigo-400'
+                  ? 'bg-[#E85D4C] text-white shadow-md'
+                  : 'bg-white text-[#1F2937] border border-gray-200 hover:border-[#E85D4C] hover:text-[#E85D4C]'
               )}
             >
               {option} jam
@@ -203,8 +220,8 @@ export function BookingForm({ tutorId, hourlyRate, tutorName }: BookingFormProps
 
       {/* Address */}
       <div className="space-y-2">
-        <Label htmlFor="address" className="flex items-center gap-2 text-slate-700">
-          <MapPin className="w-4 h-4" />
+        <Label htmlFor="address" className="flex items-center gap-2 text-[#1F2937]">
+          <MapPin className="w-4 h-4 text-[#E85D4C]" />
           Alamat Lengkap
         </Label>
         <textarea
@@ -213,8 +230,8 @@ export function BookingForm({ tutorId, hourlyRate, tutorName }: BookingFormProps
           onChange={(e) => { setAddress(e.target.value); setError(null); }}
           placeholder="Jl. Mawar No. 123, Kelurahan..., Kecamatan..., Kota..."
           className={cn(
-            "w-full p-4 border-2 border-slate-200 rounded-xl transition-all duration-200",
-            "focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none",
+            "w-full p-4 border-2 border-gray-200 rounded-xl transition-all duration-200",
+            "focus:border-[#E85D4C] focus:ring-2 focus:ring-[#E85D4C]/20 focus:outline-none",
             "min-h-[100px] resize-none"
           )}
         />
@@ -229,28 +246,28 @@ export function BookingForm({ tutorId, hourlyRate, tutorName }: BookingFormProps
       )}
 
       {/* Price Breakdown */}
-      <div className="bg-slate-50 rounded-xl p-5 space-y-3">
-        <h4 className="font-semibold text-slate-900">Rincian Biaya</h4>
+      <div className="bg-gray-50 rounded-xl p-5 space-y-3">
+        <h4 className="font-semibold text-[#1F2937]">Rincian Biaya</h4>
 
         <div className="space-y-2 text-sm">
-          <div className="flex justify-between text-slate-600">
+          <div className="flex justify-between text-[#6B7280]">
             <span>Tarif per jam</span>
             <span>Rp {hourlyRate.toLocaleString('id-ID')}</span>
           </div>
-          <div className="flex justify-between text-slate-600">
+          <div className="flex justify-between text-[#6B7280]">
             <span>Durasi</span>
             <span>{duration} jam</span>
           </div>
-          <div className="h-px bg-slate-200" />
-          <div className="flex justify-between text-slate-900 font-semibold text-base">
+          <div className="h-px bg-gray-200" />
+          <div className="flex justify-between text-[#1F2937] font-semibold text-base">
             <span>Total</span>
             <span>Rp {totalAmount.toLocaleString('id-ID')}</span>
           </div>
-          <div className="flex justify-between text-xs text-slate-500">
+          <div className="flex justify-between text-xs text-[#9CA3AF]">
             <span>Biaya platform (15%)</span>
             <span>Rp {commission.toLocaleString('id-ID')}</span>
           </div>
-          <div className="flex justify-between text-xs text-emerald-600 font-medium">
+          <div className="flex justify-between text-xs text-[#0D9488] font-medium">
             <span>Pendapatan tutor</span>
             <span>Rp {tutorEarnings.toLocaleString('id-ID')}</span>
           </div>
@@ -261,7 +278,7 @@ export function BookingForm({ tutorId, hourlyRate, tutorName }: BookingFormProps
       <Button
         onClick={handleSubmit}
         disabled={loading}
-        className="w-full h-14 text-base font-semibold bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+        className="w-full h-14 text-base font-semibold bg-[#E85D4C] hover:bg-[#C94A3B] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-orange-200 rounded-xl"
       >
         {loading ? (
           <>
@@ -276,7 +293,7 @@ export function BookingForm({ tutorId, hourlyRate, tutorName }: BookingFormProps
         )}
       </Button>
 
-      <p className="text-xs text-center text-slate-400">
+      <p className="text-xs text-center text-[#9CA3AF]">
         Pembayaran aman melalui Midtrans
       </p>
     </div>

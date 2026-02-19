@@ -288,12 +288,12 @@ export function WilayahLocationPicker({ onChange, value }: WilayahLocationPicker
     <div className="space-y-5">
       {/* Label */}
       <div className="flex items-center gap-2">
-        <div className="w-10 h-10 bg-gradient-to-br from-indigo-100 to-violet-100 rounded-xl flex items-center justify-center">
-          <Navigation className="w-5 h-5 text-indigo-600" />
+        <div className="w-10 h-10 bg-gradient-to-br from-[#F0FDFA] to-[#F0FDFA] rounded-xl flex items-center justify-center">
+          <Navigation className="w-5 h-5 text-[#0D9488]" />
         </div>
         <div>
-          <label className="font-bold text-slate-900 text-lg">Lokasi</label>
-          <p className="text-sm text-slate-500">Tentukan lokasi untuk mencari tutor terdekat</p>
+          <label className="font-bold text-[#1F2937] text-lg">Lokasi</label>
+          <p className="text-sm text-[#6B7280]">Tentukan lokasi untuk mencari tutor terdekat</p>
         </div>
       </div>
 
@@ -317,40 +317,40 @@ export function WilayahLocationPicker({ onChange, value }: WilayahLocationPicker
         disabled={gpsLoading}
         variant="outline"
         className={cn(
-          "w-full h-auto py-4 justify-start gap-4 text-left border-2 border-slate-200 hover:border-indigo-400",
+          "w-full h-auto py-4 justify-start gap-4 text-left border-2 border-gray-200 hover:border-[#E85D4C]",
           "rounded-2xl transition-all duration-200 group"
         )}
       >
-        <div className="w-12 h-12 bg-gradient-to-br from-indigo-100 to-violet-100 rounded-xl flex items-center justify-center group-hover:from-indigo-200 group-hover:to-violet-200 transition-colors">
+        <div className="w-12 h-12 bg-gradient-to-br from-[#FEF2F0] to-[#FEF2F0] rounded-xl flex items-center justify-center group-hover:from-[#FEF2F0] group-hover:to-[#FEF2F0] transition-colors">
           {gpsLoading ? (
-            <Loader2 className="w-6 h-6 text-indigo-600 animate-spin" />
+            <Loader2 className="w-6 h-6 text-[#E85D4C] animate-spin" />
           ) : (
-            <Crosshair className="w-6 h-6 text-indigo-600" />
+            <Crosshair className="w-6 h-6 text-[#E85D4C]" />
           )}
         </div>
         <div className="flex-1">
-          <p className="font-bold text-slate-900 text-base">Gunakan Lokasi Saat Ini</p>
-          <p className="text-sm text-slate-500">Deteksi otomatis GPS - Paling akurat</p>
+          <p className="font-bold text-[#1F2937] text-base">Gunakan Lokasi Saat Ini</p>
+          <p className="text-sm text-[#6B7280]">Deteksi otomatis GPS - Paling akurat</p>
         </div>
-        <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors" />
+        <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-[#E85D4C] transition-colors" />
       </Button>
 
       {/* GPS Detected Location Banner */}
       {showGpsBanner && detectedAddress && (
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-4 sm:p-5 flex items-start gap-3">
-          <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-            <MapPin className="w-5 h-5 text-blue-600" />
+        <div className="bg-gradient-to-r from-[#F0FDFA] to-[#F0FDFA] border border-[#0D9488]/20 rounded-2xl p-4 sm:p-5 flex items-start gap-3">
+          <div className="w-10 h-10 bg-[#0D9488] rounded-xl flex items-center justify-center flex-shrink-0">
+            <MapPin className="w-5 h-5 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-slate-900">Lokasi terdeteksi</p>
-            <p className="text-sm text-slate-600 truncate">{detectedAddress}</p>
-            <p className="text-xs text-blue-600 mt-1">
+            <p className="font-semibold text-[#1F2937]">Lokasi terdeteksi</p>
+            <p className="text-sm text-[#6B7280] truncate">{detectedAddress}</p>
+            <p className="text-xs text-[#0D9488] mt-1">
               Anda bisa langsung mencari guru terdekat
             </p>
           </div>
           <button
             onClick={clearGpsLocation}
-            className="text-sm text-slate-500 hover:text-red-600 font-medium px-3 py-1 rounded-full hover:bg-red-50 transition-colors"
+            className="text-sm text-[#6B7280] hover:text-red-600 font-medium px-3 py-1 rounded-full hover:bg-red-50 transition-colors"
           >
             Hapus
           </button>
@@ -361,23 +361,23 @@ export function WilayahLocationPicker({ onChange, value }: WilayahLocationPicker
       {!coords && (
         <div className="relative py-2">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-slate-200" />
+            <div className="w-full border-t border-gray-200" />
           </div>
           <div className="relative flex justify-center">
-            <span className="px-4 bg-white text-slate-400 text-sm font-medium">atau pilih manual</span>
+            <span className="px-4 bg-white text-[#9CA3AF] text-sm font-medium">atau pilih manual</span>
           </div>
         </div>
       )}
 
       {/* GPS Active Indicator */}
       {coords && (
-        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-4 sm:p-5 flex items-center gap-4">
-          <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Check className="w-6 h-6 text-emerald-600" />
+        <div className="bg-gradient-to-r from-[#ECFDF5] to-[#ECFDF5] border border-[#10B981]/20 rounded-2xl p-4 sm:p-5 flex items-center gap-4">
+          <div className="w-12 h-12 bg-[#10B981] rounded-xl flex items-center justify-center flex-shrink-0">
+            <Check className="w-6 h-6 text-white" />
           </div>
           <div className="flex-1">
-            <p className="font-bold text-slate-900">Menggunakan lokasi GPS</p>
-            <p className="text-sm text-slate-600">Anda bisa langsung mencari guru terdekat</p>
+            <p className="font-bold text-[#1F2937]">Menggunakan lokasi GPS</p>
+            <p className="text-sm text-[#6B7280]">Anda bisa langsung mencari guru terdekat</p>
           </div>
         </div>
       )}
@@ -387,8 +387,8 @@ export function WilayahLocationPicker({ onChange, value }: WilayahLocationPicker
         <div className="space-y-4">
           {/* Province */}
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-              <span className="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+            <label className="text-sm font-semibold text-[#1F2937] flex items-center gap-2">
+              <span className="w-6 h-6 bg-[#FEF2F0] text-[#E85D4C] rounded-full flex items-center justify-center text-xs font-bold">1</span>
               Provinsi
             </label>
             <Select
@@ -396,7 +396,7 @@ export function WilayahLocationPicker({ onChange, value }: WilayahLocationPicker
               onValueChange={handleProvinceChange}
               disabled={loading.provinces}
             >
-              <SelectTrigger className="h-12 sm:h-14 rounded-xl border-slate-200 focus:ring-indigo-500 focus:border-indigo-500">
+              <SelectTrigger className="h-12 sm:h-14 rounded-xl border-gray-200 focus:ring-[#E85D4C] focus:border-[#E85D4C]">
                 <SelectValue placeholder={loading.provinces ? 'Memuat...' : 'Pilih Provinsi'} />
               </SelectTrigger>
               <SelectContent className="max-h-[300px]">
@@ -411,8 +411,8 @@ export function WilayahLocationPicker({ onChange, value }: WilayahLocationPicker
 
           {/* City */}
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-              <span className="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+            <label className="text-sm font-semibold text-[#1F2937] flex items-center gap-2">
+              <span className="w-6 h-6 bg-[#FEF2F0] text-[#E85D4C] rounded-full flex items-center justify-center text-xs font-bold">2</span>
               Kota/Kabupaten
             </label>
             <Select
@@ -420,7 +420,7 @@ export function WilayahLocationPicker({ onChange, value }: WilayahLocationPicker
               onValueChange={handleCityChange}
               disabled={!selectedProvince || loading.cities}
             >
-              <SelectTrigger className="h-12 sm:h-14 rounded-xl border-slate-200 focus:ring-indigo-500 focus:border-indigo-500">
+              <SelectTrigger className="h-12 sm:h-14 rounded-xl border-gray-200 focus:ring-[#E85D4C] focus:border-[#E85D4C]">
                 <SelectValue placeholder={
                   !selectedProvince ? 'Pilih provinsi dulu' :
                   loading.cities ? 'Memuat...' :
@@ -439,8 +439,8 @@ export function WilayahLocationPicker({ onChange, value }: WilayahLocationPicker
 
           {/* District */}
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-              <span className="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+            <label className="text-sm font-semibold text-[#1F2937] flex items-center gap-2">
+              <span className="w-6 h-6 bg-[#FEF2F0] text-[#E85D4C] rounded-full flex items-center justify-center text-xs font-bold">3</span>
               Kecamatan
             </label>
             <Select
@@ -448,7 +448,7 @@ export function WilayahLocationPicker({ onChange, value }: WilayahLocationPicker
               onValueChange={handleDistrictChange}
               disabled={!selectedCity || loading.districts}
             >
-              <SelectTrigger className="h-12 sm:h-14 rounded-xl border-slate-200 focus:ring-indigo-500 focus:border-indigo-500">
+              <SelectTrigger className="h-12 sm:h-14 rounded-xl border-gray-200 focus:ring-[#E85D4C] focus:border-[#E85D4C]">
                 <SelectValue placeholder={
                   !selectedCity ? 'Pilih kota dulu' :
                   loading.districts ? 'Memuat...' :
@@ -467,8 +467,8 @@ export function WilayahLocationPicker({ onChange, value }: WilayahLocationPicker
 
           {/* Village */}
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-              <span className="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xs font-bold">4</span>
+            <label className="text-sm font-semibold text-[#1F2937] flex items-center gap-2">
+              <span className="w-6 h-6 bg-[#FEF2F0] text-[#E85D4C] rounded-full flex items-center justify-center text-xs font-bold">4</span>
               Kelurahan/Desa
             </label>
             <Select
@@ -476,7 +476,7 @@ export function WilayahLocationPicker({ onChange, value }: WilayahLocationPicker
               onValueChange={handleVillageChange}
               disabled={!selectedDistrict || loading.villages}
             >
-              <SelectTrigger className="h-12 sm:h-14 rounded-xl border-slate-200 focus:ring-indigo-500 focus:border-indigo-500">
+              <SelectTrigger className="h-12 sm:h-14 rounded-xl border-gray-200 focus:ring-[#E85D4C] focus:border-[#E85D4C]">
                 <SelectValue placeholder={
                   !selectedDistrict ? 'Pilih kecamatan dulu' :
                   loading.villages ? 'Memuat...' :
@@ -495,16 +495,16 @@ export function WilayahLocationPicker({ onChange, value }: WilayahLocationPicker
 
           {/* Selected Summary - Manual */}
           {isComplete && (
-            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-4 sm:p-5 flex items-start gap-4">
-              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Check className="w-6 h-6 text-emerald-600" />
+            <div className="bg-gradient-to-r from-[#ECFDF5] to-[#ECFDF5] border border-[#10B981]/20 rounded-2xl p-4 sm:p-5 flex items-start gap-4">
+              <div className="w-12 h-12 bg-[#10B981] rounded-xl flex items-center justify-center flex-shrink-0">
+                <Check className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <p className="font-bold text-slate-900">Lokasi lengkap dipilih</p>
-                <p className="text-sm text-slate-600">
+                <p className="font-bold text-[#1F2937]">Lokasi lengkap dipilih</p>
+                <p className="text-sm text-[#6B7280]">
                   {selectedVillage?.name}, {selectedDistrict?.name}
                 </p>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-[#6B7280] mt-1">
                   {selectedCity?.type === 'city' ? 'Kota ' : 'Kabupaten '}{selectedCity?.name}, {selectedProvince?.name}
                 </p>
               </div>
@@ -517,8 +517,8 @@ export function WilayahLocationPicker({ onChange, value }: WilayahLocationPicker
       <Dialog open={showPermissionDialog} onOpenChange={setShowPermissionDialog}>
         <DialogContent className="sm:max-w-md rounded-2xl">
           <DialogHeader>
-            <div className="w-14 h-14 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <MapPin className="w-7 h-7 text-indigo-600" />
+            <div className="w-14 h-14 bg-[#FEF2F0] rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <MapPin className="w-7 h-7 text-[#E85D4C]" />
             </div>
             <DialogTitle className="text-center text-xl">
               Izin Akses Lokasi
@@ -527,21 +527,21 @@ export function WilayahLocationPicker({ onChange, value }: WilayahLocationPicker
               LesGo membutuhkan akses lokasi Anda untuk menemukan guru les terdekat di area Anda.
             </DialogDescription>
           </DialogHeader>
-          <div className="bg-slate-50 rounded-xl p-4 mt-4">
-            <p className="text-sm font-medium text-slate-700 mb-2">
+          <div className="bg-gray-50 rounded-xl p-4 mt-4">
+            <p className="text-sm font-medium text-[#1F2937] mb-2">
               Data lokasi Anda digunakan untuk:
             </p>
-            <ul className="text-sm text-slate-600 space-y-2">
+            <ul className="text-sm text-[#6B7280] space-y-2">
               <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                <Check className="w-4 h-4 text-[#10B981] mt-0.5 flex-shrink-0" />
                 Mencari guru les di radius 15km dari lokasi Anda
               </li>
               <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                <Check className="w-4 h-4 text-[#10B981] mt-0.5 flex-shrink-0" />
                 Menghitung jarak antara Anda dan tutor
               </li>
               <li className="flex items-start gap-2">
-                <Check className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                <Check className="w-4 h-4 text-[#10B981] mt-0.5 flex-shrink-0" />
                 Memberikan rekomendasi tutor terdekat
               </li>
             </ul>
@@ -556,7 +556,7 @@ export function WilayahLocationPicker({ onChange, value }: WilayahLocationPicker
             </Button>
             <Button
               onClick={confirmGpsPermission}
-              className="flex-1 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 rounded-xl h-12 font-semibold"
+              className="flex-1 bg-gradient-to-r from-[#E85D4C] to-[#F97316] hover:from-[#C94A3B] hover:to-[#EA580C] rounded-xl h-12 font-semibold"
             >
               Izinkan Akses
             </Button>
@@ -566,4 +566,3 @@ export function WilayahLocationPicker({ onChange, value }: WilayahLocationPicker
     </div>
   );
 }
-
