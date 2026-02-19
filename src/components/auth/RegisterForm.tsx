@@ -156,7 +156,7 @@ export function RegisterForm() {
               </div>
               <h3 className="text-lg font-semibold text-slate-900">Lengkapi Data Anda</h3>
               <p className="text-sm text-slate-500">
-                Daftar sebagai {role === 'parent' ? 'Orang Tua' : 'Guru'}
+                Daftar sebagai {role === 'parent' ? 'Siswa' : 'Guru'}
               </p>
             </div>
 

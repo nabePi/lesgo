@@ -38,8 +38,8 @@ export function RoleSelector({ value, onChange }: RoleSelectorProps) {
           )} />
         </div>
         <div className="text-center">
-          <div className="font-semibold text-sm">Orang Tua</div>
-          <div className="text-xs text-slate-500 mt-0.5">Cari guru untuk anak</div>
+          <div className="font-semibold text-sm">Siswa</div>
+          <div className="text-xs text-slate-500 mt-0.5">Cari guru les private</div>
         </div>
       </button>
 
