@@ -100,7 +100,7 @@ export function BookingRequests({ bookings }: BookingRequestsProps) {
           <Inbox className="w-8 h-8 text-slate-400" />
         </div>
         <h3 className="font-semibold text-slate-900 mb-1">Belum ada booking</h3>
-        <p className="text-sm text-slate-500">Booking dari orang tua akan muncul di sini</p>
+        <p className="text-sm text-slate-500">Booking dari siswa akan muncul di sini</p>
       </div>
     );
   }
