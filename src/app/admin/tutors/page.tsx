@@ -22,6 +22,8 @@ import {
   User,
   Phone,
   Mail,
+  Building2,
+  Calendar,
 } from 'lucide-react';
 
 interface Tutor {
@@ -41,6 +43,19 @@ interface Tutor {
   address: string;
   submitted_at: string;
   approved_at: string;
+  birth_place?: string;
+  birth_date?: string;
+  gender?: string;
+  last_education?: string;
+  school_name?: string;
+  id_card_url?: string;
+  selfie_url?: string;
+  province_id?: string;
+  city_id?: string;
+  district_id?: string;
+  village_id?: string;
+  location_lat?: number;
+  location_lng?: number;
 }
 
 type FilterStatus = 'all' | 'active' | 'pending' | 'inactive';
@@ -54,6 +69,14 @@ export default function AdminTutorsPage() {
   const [statusFilter, setStatusFilter] = useState<FilterStatus>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [selectedTutor, setSelectedTutor] = useState<Tutor | null>(null);
+  const [locationNames, setLocationNames] = useState<{
+    province: string;
+    city: string;
+    district: string;
+    village: string;
+  } | null>(null);
+  const [loadingLocation, setLoadingLocation] = useState(false);
 
   useEffect(() => {
     checkAdminAndLoadData();
@@ -96,7 +119,7 @@ export default function AdminTutorsPage() {
         .from('tutor_profiles')
         .select(`
           *,
-          user:profiles!tutor_profiles_user_id_fkey(name, email, whatsapp)
+          user:profiles!tutor_profiles_user_id_fkey(name, email, whatsapp, birth_place, birth_date, gender)
         `)
         .order('created_at', { ascending: false });
 
@@ -119,6 +142,19 @@ export default function AdminTutorsPage() {
         address: tutor.address as string,
         submitted_at: tutor.submitted_at as string,
         approved_at: tutor.approved_at as string,
+        birth_place: (tutor.user as Record<string, string>)?.birth_place || '',
+        birth_date: (tutor.user as Record<string, string>)?.birth_date || '',
+        gender: (tutor.user as Record<string, string>)?.gender || '',
+        last_education: tutor.last_education as string,
+        school_name: tutor.school_name as string,
+        id_card_url: tutor.id_card_url as string,
+        selfie_url: tutor.selfie_url as string,
+        province_id: tutor.province_id as string,
+        city_id: tutor.city_id as string,
+        district_id: tutor.district_id as string,
+        village_id: tutor.village_id as string,
+        location_lat: tutor.location_lat as number,
+        location_lng: tutor.location_lng as number,
       }));
 
       setTutors(formattedTutors);
@@ -158,6 +194,64 @@ export default function AdminTutorsPage() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/');
+  };
+
+  const fetchLocationNames = async (tutor: Tutor) => {
+    if (!tutor.province_id) return;
+
+    setLoadingLocation(true);
+    try {
+      const names: { province: string; city: string; district: string; village: string } = {
+        province: '',
+        city: '',
+        district: '',
+        village: '',
+      };
+
+      if (tutor.province_id) {
+        const res = await fetch('/api/wilayah/provinces');
+        const provinces = await res.json();
+        const province = provinces.find((p: { id: string; name: string }) => p.id === tutor.province_id);
+        if (province) names.province = province.name;
+      }
+
+      if (tutor.city_id) {
+        const res = await fetch(`/api/wilayah/cities?provinceId=${tutor.province_id}`);
+        const cities = await res.json();
+        const city = cities.find((c: { id: string; name: string }) => c.id === tutor.city_id);
+        if (city) names.city = city.name;
+      }
+
+      if (tutor.district_id) {
+        const res = await fetch(`/api/wilayah/districts?cityId=${tutor.city_id}`);
+        const districts = await res.json();
+        const district = districts.find((d: { id: string; name: string }) => d.id === tutor.district_id);
+        if (district) names.district = district.name;
+      }
+
+      if (tutor.village_id) {
+        const res = await fetch(`/api/wilayah/villages?districtId=${tutor.district_id}`);
+        const villages = await res.json();
+        const village = villages.find((v: { id: string; name: string }) => v.id === tutor.village_id);
+        if (village) names.village = village.name;
+      }
+
+      setLocationNames(names);
+    } catch (error) {
+      console.error('Error fetching location names:', error);
+    } finally {
+      setLoadingLocation(false);
+    }
+  };
+
+  const openTutorDetail = (tutor: Tutor) => {
+    setSelectedTutor(tutor);
+    fetchLocationNames(tutor);
+  };
+
+  const closeTutorDetail = () => {
+    setSelectedTutor(null);
+    setLocationNames(null);
   };
 
   const getStatusBadge = (tutor: Tutor) => {
@@ -360,7 +454,7 @@ export default function AdminTutorsPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => router.push(`/admin/tutor-approvals`)}
+                          onClick={() => openTutorDetail(tutor)}
                         >
                           Detail
                         </Button>
@@ -405,6 +499,216 @@ export default function AdminTutorsPage() {
           )}
         </div>
       </main>
+
+      {/* Detail Modal */}
+      {selectedTutor && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-auto">
+            <div className="p-6 border-b border-slate-200 flex justify-between items-center">
+              <h2 className="text-xl font-bold">Detail Tutor</h2>
+              <button
+                onClick={closeTutorDetail}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Personal Info */}
+              <div>
+                <h3 className="font-semibold text-slate-900 mb-3">Data Pribadi</h3>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-slate-500">Nama Lengkap</span>
+                    <p className="font-medium">{selectedTutor.name}</p>
+                  </div>
+                  <div>
+                    <span className="text-slate-500">Jenis Kelamin</span>
+                    <p className="font-medium capitalize">{selectedTutor.gender === 'male' ? 'Laki-laki' : selectedTutor.gender === 'female' ? 'Perempuan' : '-'}</p>
+                  </div>
+                  <div>
+                    <span className="text-slate-500">Tempat, Tanggal Lahir</span>
+                    <p className="font-medium">{selectedTutor.birth_place || '-'}, {selectedTutor.birth_date || '-'}</p>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 flex items-center gap-1">
+                      <Phone className="w-3 h-3" /> WhatsApp
+                    </span>
+                    <p className="font-medium">{selectedTutor.whatsapp || '-'}</p>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 flex items-center gap-1">
+                      <Mail className="w-3 h-3" /> Email
+                    </span>
+                    <p className="font-medium">{selectedTutor.email}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Documents */}
+              {(selectedTutor.id_card_url || selectedTutor.selfie_url) && (
+                <div>
+                  <h3 className="font-semibold text-slate-900 mb-3">Dokumen</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    {selectedTutor.id_card_url && (
+                      <div>
+                        <span className="text-slate-500 text-sm">KTP</span>
+                        <img
+                          src={selectedTutor.id_card_url.startsWith('http') ? selectedTutor.id_card_url : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/tutor-documents/${selectedTutor.id_card_url}`}
+                          alt="KTP"
+                          className="mt-2 rounded-lg border w-full h-32 object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><text x="50" y="50" text-anchor="middle">KTP Error</text></svg>';
+                          }}
+                        />
+                      </div>
+                    )}
+                    {selectedTutor.selfie_url && (
+                      <div>
+                        <span className="text-slate-500 text-sm">Foto Diri</span>
+                        <img
+                          src={selectedTutor.selfie_url.startsWith('http') ? selectedTutor.selfie_url : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/tutor-documents/${selectedTutor.selfie_url}`}
+                          alt="Foto Diri"
+                          className="mt-2 rounded-lg border w-full h-32 object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><text x="50" y="50" text-anchor="middle">Foto Error</text></svg>';
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Location */}
+              <div>
+                <h3 className="font-semibold text-slate-900 mb-3">Lokasi</h3>
+
+                {selectedTutor.province_id && (
+                  <div className="bg-slate-50 rounded-lg p-4 mb-3">
+                    {loadingLocation ? (
+                      <div className="flex items-center gap-2 text-sm text-slate-500">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Memuat data lokasi...
+                      </div>
+                    ) : locationNames?.province ? (
+                      <div className="space-y-2">
+                        <div className="flex items-start gap-2">
+                          <span className="text-xs font-medium text-slate-500 w-20">Provinsi</span>
+                          <span className="text-sm font-medium text-slate-900">{locationNames.province}</span>
+                        </div>
+                        {locationNames.city && (
+                          <div className="flex items-start gap-2">
+                            <span className="text-xs font-medium text-slate-500 w-20">Kota/Kab</span>
+                            <span className="text-sm text-slate-800">{locationNames.city}</span>
+                          </div>
+                        )}
+                        {locationNames.district && (
+                          <div className="flex items-start gap-2">
+                            <span className="text-xs font-medium text-slate-500 w-20">Kecamatan</span>
+                            <span className="text-sm text-slate-800">{locationNames.district}</span>
+                          </div>
+                        )}
+                        {locationNames.village && (
+                          <div className="flex items-start gap-2">
+                            <span className="text-xs font-medium text-slate-500 w-20">Desa/Kel</span>
+                            <span className="text-sm text-slate-800">{locationNames.village}</span>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-slate-500">Data lokasi tidak ditemukan</p>
+                    )}
+                  </div>
+                )}
+
+                {selectedTutor.address && (
+                  <div className="flex items-start gap-2 text-sm">
+                    <MapPin className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <span className="text-slate-500 block text-xs mb-1">Alamat Lengkap</span>
+                      <p className="text-slate-800">{selectedTutor.address}</p>
+                    </div>
+                  </div>
+                )}
+
+                {selectedTutor.location_lat && selectedTutor.location_lng && (
+                  <p className="text-sm text-slate-500 mt-2 ml-6">
+                    Koordinat: {selectedTutor.location_lat}, {selectedTutor.location_lng}
+                  </p>
+                )}
+              </div>
+
+              {/* Education */}
+              {(selectedTutor.last_education || selectedTutor.school_name) && (
+                <div>
+                  <h3 className="font-semibold text-slate-900 mb-3">Pendidikan</h3>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Building2 className="w-4 h-4 text-slate-400" />
+                    <span>{selectedTutor.last_education || '-'} - {selectedTutor.school_name || '-'}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Subjects & Rate */}
+              <div>
+                <h3 className="font-semibold text-slate-900 mb-3">Mengajar</h3>
+                {selectedTutor.subjects && selectedTutor.subjects.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {selectedTutor.subjects.map((subject) => (
+                      <span
+                        key={subject}
+                        className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm"
+                      >
+                        {subject}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <p className="text-lg font-bold text-emerald-600">
+                  Rp {selectedTutor.hourly_rate?.toLocaleString('id-ID')}/jam
+                </p>
+              </div>
+
+              {/* Status */}
+              <div>
+                <h3 className="font-semibold text-slate-900 mb-3">Status</h3>
+                <div className="flex items-center gap-2">
+                  {selectedTutor.is_active ? (
+                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium">
+                      <CheckCircle2 className="w-4 h-4" />
+                      Aktif
+                    </span>
+                  ) : selectedTutor.is_onboarded ? (
+                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-medium">
+                      <Clock className="w-4 h-4" />
+                      Menunggu Verifikasi
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-sm font-medium">
+                      <XCircle className="w-4 h-4" />
+                      Belum Lengkap
+                    </span>
+                  )}
+                </div>
+                {selectedTutor.submitted_at && (
+                  <p className="text-sm text-slate-500 mt-2">
+                    <Calendar className="w-3 h-3 inline mr-1" />
+                    Terdaftar: {new Date(selectedTutor.submitted_at).toLocaleDateString('id-ID')}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-slate-200 flex justify-end">
+              <Button variant="outline" onClick={closeTutorDetail}>
+                Tutup
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -18,6 +18,10 @@ interface PendingTutor {
   address: string;
   location_lat: number;
   location_lng: number;
+  province_id: string;
+  city_id: string;
+  district_id: string;
+  village_id: string;
   id_card_url: string;
   selfie_url: string;
   last_education: string;
@@ -63,6 +67,13 @@ export default function TutorApprovalsPage() {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState<string | null>(null);
   const [selectedTutor, setSelectedTutor] = useState<PendingTutor | null>(null);
+  const [locationNames, setLocationNames] = useState<{
+    province: string;
+    city: string;
+    district: string;
+    village: string;
+  } | null>(null);
+  const [loadingLocation, setLoadingLocation] = useState(false);
   const [notification, setNotification] = useState<NotificationState>({ show: false, type: 'success', message: '' });
 
   useEffect(() => {
@@ -127,6 +138,10 @@ export default function TutorApprovalsPage() {
             birth_date: (tutor.user as Record<string, string>)?.birth_date,
             gender: (tutor.user as Record<string, string>)?.gender,
             availability: availability || [],
+            province_id: (tutor as Record<string, string>)?.province_id,
+            city_id: (tutor as Record<string, string>)?.city_id,
+            district_id: (tutor as Record<string, string>)?.district_id,
+            village_id: (tutor as Record<string, string>)?.village_id,
           };
         })
       );
@@ -197,6 +212,58 @@ export default function TutorApprovalsPage() {
     }
   };
 
+  const fetchLocationNames = async (tutor: PendingTutor) => {
+    if (!tutor.province_id) return;
+
+    setLoadingLocation(true);
+    try {
+      const names: { province: string; city: string; district: string; village: string } = {
+        province: '',
+        city: '',
+        district: '',
+        village: '',
+      };
+
+      // Fetch province name
+      if (tutor.province_id) {
+        const res = await fetch('/api/wilayah/provinces');
+        const provinces = await res.json();
+        const province = provinces.find((p: { id: string; name: string }) => p.id === tutor.province_id);
+        if (province) names.province = province.name;
+      }
+
+      // Fetch city name
+      if (tutor.city_id) {
+        const res = await fetch(`/api/wilayah/cities?provinceId=${tutor.province_id}`);
+        const cities = await res.json();
+        const city = cities.find((c: { id: string; name: string }) => c.id === tutor.city_id);
+        if (city) names.city = city.name;
+      }
+
+      // Fetch district name
+      if (tutor.district_id) {
+        const res = await fetch(`/api/wilayah/districts?cityId=${tutor.city_id}`);
+        const districts = await res.json();
+        const district = districts.find((d: { id: string; name: string }) => d.id === tutor.district_id);
+        if (district) names.district = district.name;
+      }
+
+      // Fetch village name
+      if (tutor.village_id) {
+        const res = await fetch(`/api/wilayah/villages?districtId=${tutor.district_id}`);
+        const villages = await res.json();
+        const village = villages.find((v: { id: string; name: string }) => v.id === tutor.village_id);
+        if (village) names.village = village.name;
+      }
+
+      setLocationNames(names);
+    } catch (error) {
+      console.error('Error fetching location names:', error);
+    } finally {
+      setLoadingLocation(false);
+    }
+  };
+
   const handleReject = async (tutorId: string, tutorEmail: string, tutorName: string) => {
     if (!confirm(`Yakin ingin menolak tutor ${tutorName}?`)) return;
 
@@ -230,7 +297,7 @@ export default function TutorApprovalsPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -240,7 +307,7 @@ export default function TutorApprovalsPage() {
       {/* Notification Toast */}
       {notification.show && (
         <div className={`fixed top-4 right-4 z-50 p-4 rounded-xl shadow-lg max-w-md animate-fade-in ${
-          notification.type === 'success' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'
+          notification.type === 'success' ? 'bg-success text-white' : 'bg-error text-white'
         }`}>
           <div className="flex items-center gap-3">
             {notification.type === 'success' ? (
@@ -268,7 +335,7 @@ export default function TutorApprovalsPage() {
       <main className="max-w-6xl mx-auto px-4 py-8">
         {tutors.length === 0 ? (
           <div className="text-center py-16">
-            <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
+            <CheckCircle2 className="w-16 h-16 text-success mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-slate-900">Semua tutor sudah diverifikasi</h2>
             <p className="text-slate-500">Tidak ada tutor yang menunggu persetujuan</p>
           </div>
@@ -281,8 +348,8 @@ export default function TutorApprovalsPage() {
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4">
-                    <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center">
-                      <User className="w-8 h-8 text-indigo-600" />
+                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                      <User className="w-8 h-8 text-primary" />
                     </div>
                     <div>
                       <h3 className="font-bold text-lg text-slate-900">{tutor.name}</h3>
@@ -306,6 +373,7 @@ export default function TutorApprovalsPage() {
                       onClick={() => {
                         console.log('Selected tutor:', tutor);
                         setSelectedTutor(tutor);
+                        fetchLocationNames(tutor);
                       }}
                     >
                       Lihat Detail
@@ -313,7 +381,7 @@ export default function TutorApprovalsPage() {
                     <Button
                       onClick={() => handleApprove(tutor.user_id, tutor.email, tutor.name)}
                       disabled={processing === tutor.user_id}
-                      className="bg-emerald-500 hover:bg-emerald-600"
+                      className="bg-success hover:bg-success-hover"
                     >
                       {processing === tutor.user_id ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -344,7 +412,10 @@ export default function TutorApprovalsPage() {
             <div className="p-6 border-b border-slate-200 flex justify-between items-center">
               <h2 className="text-xl font-bold">Detail Tutor</h2>
               <button
-                onClick={() => setSelectedTutor(null)}
+                onClick={() => {
+                  setSelectedTutor(null);
+                  setLocationNames(null);
+                }}
                 className="text-slate-400 hover:text-slate-600"
               >
                 ✕
@@ -421,13 +492,61 @@ export default function TutorApprovalsPage() {
               {/* Location */}
               <div>
                 <h3 className="font-semibold text-slate-900 mb-3">Lokasi</h3>
-                <div className="flex items-start gap-2 text-sm">
-                  <MapPin className="w-4 h-4 text-slate-400 mt-0.5" />
-                  <p>{selectedTutor.address}</p>
-                </div>
+
+                {/* Hierarchical Location */}
+                {selectedTutor.province_id && (
+                  <div className="bg-slate-50 rounded-lg p-4 mb-3">
+                    {loadingLocation ? (
+                      <div className="flex items-center gap-2 text-sm text-slate-500">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Memuat data lokasi...
+                      </div>
+                    ) : locationNames?.province ? (
+                      <div className="space-y-2">
+                        <div className="flex items-start gap-2">
+                          <span className="text-xs font-medium text-slate-500 w-20">Provinsi</span>
+                          <span className="text-sm font-medium text-slate-900">{locationNames.province}</span>
+                        </div>
+                        {locationNames.city && (
+                          <div className="flex items-start gap-2">
+                            <span className="text-xs font-medium text-slate-500 w-20">Kota/Kab</span>
+                            <span className="text-sm text-slate-800">{locationNames.city}</span>
+                          </div>
+                        )}
+                        {locationNames.district && (
+                          <div className="flex items-start gap-2">
+                            <span className="text-xs font-medium text-slate-500 w-20">Kecamatan</span>
+                            <span className="text-sm text-slate-800">{locationNames.district}</span>
+                          </div>
+                        )}
+                        {locationNames.village && (
+                          <div className="flex items-start gap-2">
+                            <span className="text-xs font-medium text-slate-500 w-20">Desa/Kel</span>
+                            <span className="text-sm text-slate-800">{locationNames.village}</span>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-slate-500">Data lokasi tidak ditemukan</p>
+                    )}
+                  </div>
+                )}
+
+                {/* Full Address */}
+                {selectedTutor.address && (
+                  <div className="flex items-start gap-2 text-sm">
+                    <MapPin className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <span className="text-slate-500 block text-xs mb-1">Alamat Lengkap</span>
+                      <p className="text-slate-800">{selectedTutor.address}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* GPS Coordinates */}
                 {selectedTutor.location_lat && selectedTutor.location_lng && (
-                  <p className="text-sm text-slate-500 mt-1">
-                    Lat: {selectedTutor.location_lat}, Lng: {selectedTutor.location_lng}
+                  <p className="text-sm text-slate-500 mt-2 ml-6">
+                    Koordinat: {selectedTutor.location_lat}, {selectedTutor.location_lng}
                   </p>
                 )}
               </div>

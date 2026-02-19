@@ -293,7 +293,7 @@ export default function AdminBookingsPage() {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <Input
-                placeholder="Cari nama orang tua, tutor, atau mata pelajaran..."
+                placeholder="Cari nama siswa, tutor, atau mata pelajaran..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -358,7 +358,7 @@ export default function AdminBookingsPage() {
                             <div className="grid md:grid-cols-2 gap-4 mt-4">
                               {/* Parent Info */}
                               <div className="bg-slate-50 rounded-lg p-3">
-                                <p className="text-xs text-slate-500 mb-1">Orang Tua</p>
+                                <p className="text-xs text-slate-500 mb-1">Siswa</p>
                                 <p className="font-medium text-slate-900">{booking.parent_name}</p>
                                 {booking.parent_whatsapp && (
                                   <p className="text-sm text-slate-500 flex items-center gap-1 mt-1">

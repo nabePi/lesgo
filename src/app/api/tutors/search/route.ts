@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     // Search all active tutors with subjects, then sort by distance
     let { data: tutors, error } = await supabaseServer
       .from('tutor_profiles')
-      .select('*, user:profiles(*)')
+      .select('*, user:profiles!tutor_profiles_user_id_fkey(*)')
       .eq('is_active', true)
       .contains('subjects', [subject])
       .order('rating', { ascending: false });
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
   // Step 1: Search for tutors in the same village
   let { data: tutors, error } = await supabaseServer
     .from('tutor_profiles')
-    .select('*, user:profiles(*)')
+    .select('*, user:profiles!tutor_profiles_user_id_fkey(*)')
     .eq('village_id', villageId)
     .eq('is_active', true)
     .contains('subjects', [subject])
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
   if ((!tutors || tutors.length === 0) && districtId) {
     const { data: districtTutors, error: districtError } = await supabaseServer
       .from('tutor_profiles')
-      .select('*, user:profiles(*)')
+      .select('*, user:profiles!tutor_profiles_user_id_fkey(*)')
       .eq('district_id', districtId)
       .eq('is_active', true)
       .contains('subjects', [subject])

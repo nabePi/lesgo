@@ -55,14 +55,14 @@ export async function POST(request: NextRequest) {
 
           <div style="background-color: #f0fdf4; border-left: 4px solid #10b981; padding: 15px; margin: 20px 0;">
             <p style="margin: 0;"><strong>Status:</strong> Aktif</p>
-            <p style="margin: 5px 0 0 0;">Anda sekarang dapat menerima permintaan les dari orang tua.</p>
+            <p style="margin: 5px 0 0 0;">Anda sekarang dapat menerima permintaan les dari siswa.</p>
           </div>
 
           <p>Langkah selanjutnya:</p>
           <ul>
             <li>Login ke akun tutor Anda</li>
             <li>Pastikan profil dan jadwal Anda sudah lengkap</li>
-            <li>Tunggu permintaan les dari orang tua di area Anda</li>
+            <li>Tunggu permintaan les dari siswa di area Anda</li>
           </ul>
 
           <p>Terima kasih telah bergabung dengan ${APP_NAME}!</p>
