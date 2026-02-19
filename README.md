@@ -1,6 +1,6 @@
 # LesGo - Platform Les Private Indonesia
 
-Platform marketplace untuk menghubungkan orang tua/siswa dengan guru les private terdekat berdasarkan lokasi dan mata pelajaran.
+Platform marketplace untuk menghubungkan siswa dengan guru les private terdekat berdasarkan lokasi dan mata pelajaran.
 
 ## 🎯 Fitur
 

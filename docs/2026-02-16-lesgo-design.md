@@ -8,15 +8,15 @@
 
 ## Overview
 
-LesGo adalah platform marketplace jasa les private yang menghubungkan orang tua/siswa dengan guru les terdekat berdasarkan lokasi dan mata pelajaran.
+LesGo adalah platform marketplace jasa les private yang menghubungkan siswa dengan guru les terdekat berdasarkan lokasi dan mata pelajaran.
 
 ---
 
 ## Target Market
 
 **Multi-segment approach:**
-- Orang tua di kota besar (Jakarta, Surabaya, Bandung) yang sibuk kerja
-- Orang tua di seluruh Indonesia termasuk kota kecil
+- Siswa di kota besar (Jakarta, Surabaya, Bandung) yang membutuhkan guru les
+- Siswa di seluruh Indonesia termasuk kota kecil
 - Siswa SMU/SMP yang cari guru sendiri
 
 ---
@@ -27,7 +27,7 @@ LesGo adalah platform marketplace jasa les private yang menghubungkan orang tua/
 |-------|--------|
 | **Guru Model** | Freelance marketplace (guru daftar mandiri) |
 | **Monetization** | 15% commission per booking |
-| **Payment Flow** | Platform escrow — orang tua bayar ke LesGo, LesGo bayar ke guru |
+| **Payment Flow** | Platform escrow — siswa bayar ke LesGo, LesGo bayar ke guru |
 
 ---
 
@@ -49,7 +49,7 @@ LesGo adalah platform marketplace jasa les private yang menghubungkan orang tua/
 
 ## Core User Flows
 
-### For Parents (Orang Tua)
+### For Students (Siswa)
 1. Landing → Masukin mata pelajaran
 2. Location → Pakai lokasi saat ini / alamat manual
 3. Search Results → List guru terdekat (foto, rating, tarif, jarak)

@@ -646,8 +646,8 @@ export function RoleSelector({ value, onChange }: RoleSelectorProps) {
           value === 'parent' ? 'border-primary bg-primary/10' : 'border-gray-200'
         }`}
       >
-        <div className="font-semibold">Orang Tua</div>
-        <div className="text-sm text-gray-500">Cari guru untuk anak</div>
+        <div className="font-semibold">Siswa</div>
+        <div className="text-sm text-gray-500">Cari guru les private</div>
       </button>
       <button
         onClick={() => onChange('tutor')}
